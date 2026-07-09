@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
-import { DollarSign, Download, TrendingUp, CreditCard, Building2, ShoppingBag, AlertCircle } from "lucide-react";
+import { DollarSign, Download, TrendingUp, CreditCard, ShoppingBag, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ChartFilterBar } from "./analytics/ChartFilterBar";
 import { Button } from "@/components/ui/button";
@@ -12,14 +12,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import html2canvas from "html2canvas";
 import { StripeRevenueTruth } from "./analytics/StripeRevenueTruth";
-import { fetchStripeRevenueTruth } from "@/lib/admin-analytics";
+import {
+  CURRENT_REVENUE_CATEGORY_LABELS,
+  fetchStripeRevenueTruth,
+  isCurrentPremiumAccess,
+  isCurrentPremiumSubscription,
+  normalizePlanLabel,
+} from "@/lib/admin-analytics";
 
 interface RevenueData {
   period: string;
-  premium: number;
-  standalone: number;
-  personal_training: number;
-  corporate: number;
+  premium_membership: number;
+  standalone_workout: number;
+  standalone_program: number;
+  other_smartygym: number;
   total: number;
 }
 
@@ -43,18 +49,6 @@ interface PurchaseDetail {
   purchased_at: string;
 }
 
-interface CorporateDetail {
-  id: string;
-  organization_name: string;
-  plan_type: string;
-  max_users: number;
-  current_users_count: number;
-  status: string;
-  current_period_end: string;
-  annual_revenue: number;
-  is_paid: boolean;  // Has stripe_subscription_id AND stripe_customer_id
-}
-
 const COLORS = [
   "hsl(var(--primary))",
   "hsl(var(--chart-2))",
@@ -73,7 +67,6 @@ export function RevenueAnalytics() {
   const [loading, setLoading] = useState(false);
   const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionDetail[]>([]);
   const [purchaseDetails, setPurchaseDetails] = useState<PurchaseDetail[]>([]);
-  const [corporateDetails, setCorporateDetails] = useState<CorporateDetail[]>([]);
   const [activeTab, setActiveTab] = useState("stripe");
   const chartRef = useRef<HTMLDivElement>(null);
 
@@ -101,11 +94,10 @@ export function RevenueAnalytics() {
     setLoading(true);
     try {
       const { startDate, endDate } = getDateRange();
-      const revenueByMonth: { [key: string]: { premium: number; standalone: number; personal_training: number; corporate: number } } = {};
+      const revenueByMonth: { [key: string]: Omit<RevenueData, "period" | "total"> } = {};
       let total = 0;
       const subDetails: SubscriptionDetail[] = [];
       const purDetails: PurchaseDetail[] = [];
-      const corpDetails: CorporateDetail[] = [];
       const stripeTruth = await fetchStripeRevenueTruth();
 
       // Fetch subscriptions with user emails — use ACTIVE-OVERLAP semantics so
@@ -115,7 +107,6 @@ export function RevenueAnalytics() {
         let subQuery = supabase
           .from("user_subscriptions")
           .select("id, user_id, plan_type, status, created_at, current_period_end, stripe_subscription_id, stripe_customer_id, subscription_source")
-          .eq("status", "active")
           .lte("created_at", endDate.toISOString())
           .or(`current_period_end.is.null,current_period_end.gte.${startDate.toISOString()}`);
 
@@ -137,28 +128,26 @@ export function RevenueAnalytics() {
           });
 
           subscriptions.forEach((sub) => {
-            // Real money only: admin-granted memberships are complimentary (€0).
-            const isPaid = (sub as any).subscription_source !== 'admin_grant' &&
-              (!!sub.stripe_subscription_id ||
-                (sub.plan_type === 'lifetime' && (sub as any).subscription_source === 'stripe' && !!(sub as any).stripe_customer_id));
+            if (!isCurrentPremiumAccess(sub as any)) return;
+            const isPaid = isCurrentPremiumSubscription(sub as any);
             const month = new Date(sub.created_at).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
             });
 
             if (!revenueByMonth[month]) {
-              revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
+              revenueByMonth[month] = { premium_membership: 0, standalone_workout: 0, standalone_program: 0, other_smartygym: 0 };
             }
 
             // Revenue is not estimated from subscription rows anymore; Stripe payments below are the truth.
             const monthlyRevenue = 0;
 
-            if (isPaid) revenueByMonth[month].premium += monthlyRevenue;
+            if (isPaid) revenueByMonth[month].premium_membership += monthlyRevenue;
 
             subDetails.push({
               id: sub.id,
               user_email: userEmailMap[sub.user_id] || sub.user_id.slice(0, 8),
-              plan_type: sub.plan_type,
+              plan_type: normalizePlanLabel(sub as any),
               status: sub.status,
               created_at: sub.created_at,
               current_period_end: sub.current_period_end,
@@ -169,146 +158,30 @@ export function RevenueAnalytics() {
         }
       }
 
-      // Fetch standalone purchases
-      if (planFilter === "all" || planFilter === "standalone_purchases") {
-        const { data: purchases } = await supabase
-          .from("user_purchases")
-          .select("id, user_id, price, purchased_at, content_type, content_name")
-          .gte("purchased_at", startDate.toISOString())
-          .lte("purchased_at", endDate.toISOString())
-          .neq("content_type", "personal_training");
-
-        if (purchases) {
-          const userIds = [...new Set(purchases.map(p => p.user_id))];
-          const { data: profiles } = await supabase
-            .from("profiles")
-            .select("user_id, full_name")
-            .in("user_id", userIds);
-          
-          const userEmailMap: Record<string, string> = {};
-          profiles?.forEach(p => {
-            userEmailMap[p.user_id] = p.full_name || "Unknown";
-          });
-
-          purchases.forEach((purchase) => {
-            const month = new Date(purchase.purchased_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-            });
-
-            if (!revenueByMonth[month]) {
-              revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
-            }
-
-            const revenue = parseFloat(purchase.price?.toString() || "0");
-            revenueByMonth[month].standalone += revenue;
-            total += revenue;
-
-            purDetails.push({
-              id: purchase.id,
-              user_email: userEmailMap[purchase.user_id] || purchase.user_id.slice(0, 8),
-              content_name: purchase.content_name,
-              content_type: purchase.content_type,
-              price: revenue,
-              purchased_at: purchase.purchased_at,
-            });
-          });
-        }
-      }
-
-      // Fetch personal training purchases
-      if (planFilter === "all" || planFilter === "personal_training") {
-        const { data: ptPurchases } = await supabase
-          .from("user_purchases")
-          .select("id, user_id, price, purchased_at, content_name")
-          .eq("content_type", "personal_training")
-          .gte("purchased_at", startDate.toISOString())
-          .lte("purchased_at", endDate.toISOString());
-
-        if (ptPurchases) {
-          const userIds = [...new Set(ptPurchases.map(p => p.user_id))];
-          const { data: profiles } = await supabase
-            .from("profiles")
-            .select("user_id, full_name")
-            .in("user_id", userIds);
-          
-          const userEmailMap: Record<string, string> = {};
-          profiles?.forEach(p => {
-            userEmailMap[p.user_id] = p.full_name || "Unknown";
-          });
-
-          ptPurchases.forEach((purchase) => {
-            const month = new Date(purchase.purchased_at).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-            });
-
-            if (!revenueByMonth[month]) {
-              revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
-            }
-
-            const revenue = parseFloat(purchase.price?.toString() || "0");
-            revenueByMonth[month].personal_training += revenue;
-            total += revenue;
-
-            purDetails.push({
-              id: purchase.id,
-              user_email: userEmailMap[purchase.user_id] || purchase.user_id.slice(0, 8),
-              content_name: purchase.content_name,
-              content_type: "personal_training",
-              price: revenue,
-              purchased_at: purchase.purchased_at,
-            });
-          });
-        }
-      }
-
-      // Fetch corporate subscriptions — active-overlap semantics (same rule).
-      if (planFilter === "all" || planFilter === "corporate") {
-        const { data: corporateSubs } = await supabase
-          .from("corporate_subscriptions")
-          .select("*, stripe_subscription_id, stripe_customer_id")
-          .eq("status", "active")
-          .lte("created_at", endDate.toISOString())
-          .or(`current_period_end.is.null,current_period_end.gte.${startDate.toISOString()}`);
-
-        corporateSubs?.forEach((corp) => {
-          const isPaid = !!(corp.stripe_subscription_id && corp.stripe_customer_id);
-          const month = new Date(corp.created_at).toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-          });
-
-          if (!revenueByMonth[month]) {
-            revenueByMonth[month] = { premium: 0, standalone: 0, personal_training: 0, corporate: 0 };
-          }
-
-          corpDetails.push({
-            id: corp.id,
-            organization_name: corp.organization_name,
-            plan_type: corp.plan_type,
-            max_users: corp.max_users,
-            current_users_count: corp.current_users_count,
-            status: corp.status,
-            current_period_end: corp.current_period_end,
-            annual_revenue: 0,
-            is_paid: isPaid,
-          });
-        });
-      }
-
       if (stripeTruth) {
         total = stripeTruth.totalCollected;
         Object.keys(revenueByMonth).forEach(key => delete revenueByMonth[key]);
         Object.entries(stripeTruth.byMonthByCategory || {}).forEach(([monthKey, values]) => {
           const month = new Date(`${monthKey}-01T00:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "short" });
           revenueByMonth[month] = {
-            premium: values.premium || 0,
-            standalone: values.standalone || 0,
-            personal_training: values.personal_training || 0,
-            corporate: values.corporate || 0,
+            premium_membership: values.premium_membership || 0,
+            standalone_workout: values.standalone_workout || 0,
+            standalone_program: values.standalone_program || 0,
+            other_smartygym: values.other_smartygym || 0,
           };
         });
+        const stripePurchases = stripeTruth.payments
+          .filter((payment) => payment.category === "standalone_workout" || payment.category === "standalone_program")
+          .filter((payment) => planFilter === "all" || planFilter === "standalone_purchases")
+          .map((payment) => ({
+            id: payment.id,
+            user_email: payment.email || payment.customer || "Stripe customer",
+            content_name: payment.productName || payment.description || "SmartyGym purchase",
+            content_type: payment.category === "standalone_workout" ? "workout" : "program",
+            price: Number(payment.amount) || 0,
+            purchased_at: payment.date,
+          }));
+        purDetails.splice(0, purDetails.length, ...stripePurchases);
       }
 
       // Convert to chart data - sorted by date
@@ -320,11 +193,11 @@ export function RevenueAnalytics() {
         const plans = revenueByMonth[period];
         return {
           period,
-          premium: plans.premium,
-          standalone: plans.standalone,
-          personal_training: plans.personal_training,
-          corporate: plans.corporate,
-          total: plans.premium + plans.standalone + plans.personal_training + plans.corporate,
+          premium_membership: plans.premium_membership,
+          standalone_workout: plans.standalone_workout,
+          standalone_program: plans.standalone_program,
+          other_smartygym: plans.other_smartygym,
+          total: plans.premium_membership + plans.standalone_workout + plans.standalone_program + plans.other_smartygym,
         };
       });
 
@@ -332,7 +205,6 @@ export function RevenueAnalytics() {
       setTotalRevenue(total);
       setSubscriptionDetails(subDetails);
       setPurchaseDetails(purDetails);
-      setCorporateDetails(corpDetails);
     } catch (error) {
       console.error("Error fetching revenue data:", error);
       toast.error("Failed to load revenue data");
@@ -375,23 +247,21 @@ export function RevenueAnalytics() {
 
   // Calculate totals for breakdown
   const totals = revenueData.reduce((acc, item) => ({
-    premium: acc.premium + item.premium,
-    standalone: acc.standalone + item.standalone,
-    personal_training: acc.personal_training + item.personal_training,
-    corporate: acc.corporate + item.corporate,
-  }), { premium: 0, standalone: 0, personal_training: 0, corporate: 0 });
+    premium_membership: acc.premium_membership + item.premium_membership,
+    standalone_workout: acc.standalone_workout + item.standalone_workout,
+    standalone_program: acc.standalone_program + item.standalone_program,
+    other_smartygym: acc.other_smartygym + item.other_smartygym,
+  }), { premium_membership: 0, standalone_workout: 0, standalone_program: 0, other_smartygym: 0 });
 
   const pieData = [
-    { name: "Premium", value: totals.premium },
-    { name: "Standalone", value: totals.standalone },
-    { name: "Personal Training", value: totals.personal_training },
-    { name: "Corporate", value: totals.corporate },
+    { name: CURRENT_REVENUE_CATEGORY_LABELS.premium_membership, value: totals.premium_membership },
+    { name: CURRENT_REVENUE_CATEGORY_LABELS.standalone_workout, value: totals.standalone_workout },
+    { name: CURRENT_REVENUE_CATEGORY_LABELS.standalone_program, value: totals.standalone_program },
+    { name: CURRENT_REVENUE_CATEGORY_LABELS.other_smartygym, value: totals.other_smartygym },
   ].filter(d => d.value > 0);
 
   const paidSubscriptionsCount = subscriptionDetails.filter(s => s.is_paid).length;
   const freeSubscriptionsCount = subscriptionDetails.filter(s => !s.is_paid).length;
-  const paidCorporateCount = corporateDetails.filter(c => c.is_paid).length;
-  const freeCorporateCount = corporateDetails.filter(c => !c.is_paid).length;
 
   return (
     <div className="space-y-6">
@@ -402,7 +272,7 @@ export function RevenueAnalytics() {
             <DollarSign className="h-5 w-5" />
             Revenue Analytics
           </CardTitle>
-          <CardDescription>Comprehensive revenue tracking with detailed breakdowns</CardDescription>
+          <CardDescription>Stripe-only SmartyGym revenue, grouped by the current Premium and standalone products</CardDescription>
         </CardHeader>
         <CardContent>
           <ChartFilterBar
@@ -422,15 +292,13 @@ export function RevenueAnalytics() {
                   <SelectItem value="all">All Sources</SelectItem>
                   <SelectItem value="premium">Premium Memberships</SelectItem>
                   <SelectItem value="standalone_purchases">Standalone</SelectItem>
-                  <SelectItem value="personal_training">Personal Training</SelectItem>
-                  <SelectItem value="corporate">Corporate Plans</SelectItem>
                 </SelectContent>
               </Select>
             }
           />
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <Card className="bg-primary/10 border-primary/20">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
@@ -438,51 +306,41 @@ export function RevenueAnalytics() {
                   Paid Revenue Only
                 </div>
                 <p className="text-2xl font-bold">€{totalRevenue.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">Excludes complimentary</p>
+                <p className="text-xs text-muted-foreground">Stripe charges net of refunds</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
                 <div className="text-sm text-muted-foreground mb-1">Premium Memberships</div>
-                <p className="text-xl font-bold">€{totals.premium.toFixed(2)}</p>
+                <p className="text-xl font-bold">€{totals.premium_membership.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">
-                  {paidSubscriptionsCount} paid • {freeSubscriptionsCount} free
+                  {paidSubscriptionsCount} paid • {freeSubscriptionsCount} manual access
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground mb-1">Standalone</div>
-                <p className="text-xl font-bold">€{totals.standalone.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">{purchaseDetails.filter(p => p.content_type !== "personal_training").length} sales</p>
+                <div className="text-sm text-muted-foreground mb-1">Standalone Workouts</div>
+                <p className="text-xl font-bold">€{totals.standalone_workout.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">{purchaseDetails.filter(p => p.content_type === "workout").length} sales</p>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground mb-1">Personal Training</div>
-                <p className="text-xl font-bold">€{totals.personal_training.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">{purchaseDetails.filter(p => p.content_type === "personal_training").length} sessions</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-sm text-muted-foreground mb-1">Corporate</div>
-                <p className="text-xl font-bold">€{totals.corporate.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">
-                  {paidCorporateCount} paid • {freeCorporateCount} free
-                </p>
+                <div className="text-sm text-muted-foreground mb-1">Standalone Programs</div>
+                <p className="text-xl font-bold">€{totals.standalone_program.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">{purchaseDetails.filter(p => p.content_type === "program").length} sales</p>
               </CardContent>
             </Card>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="-mx-1 mb-4 overflow-x-auto">
-              <TabsList className="inline-flex w-max gap-1 px-1 md:grid md:w-full md:grid-cols-5">
+              <TabsList className="inline-flex w-max gap-1 px-1 md:grid md:w-full md:grid-cols-4">
                 <TabsTrigger value="stripe" className="whitespace-nowrap">Stripe (truth)</TabsTrigger>
                 <TabsTrigger value="overview" className="whitespace-nowrap">Overview</TabsTrigger>
                 <TabsTrigger value="subscriptions" className="whitespace-nowrap">Subscriptions</TabsTrigger>
                 <TabsTrigger value="purchases" className="whitespace-nowrap">Purchases</TabsTrigger>
-                <TabsTrigger value="corporate" className="whitespace-nowrap">Corporate</TabsTrigger>
               </TabsList>
             </div>
 
@@ -572,8 +430,8 @@ export function RevenueAnalytics() {
                           <TableHead>Period</TableHead>
                           <TableHead className="text-right">Premium</TableHead>
                           <TableHead className="text-right">Standalone</TableHead>
-                          <TableHead className="text-right">Personal Training</TableHead>
-                          <TableHead className="text-right">Corporate</TableHead>
+                            <TableHead className="text-right">Programs</TableHead>
+                            <TableHead className="text-right">Other</TableHead>
                           <TableHead className="text-right font-bold">Total</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -581,19 +439,19 @@ export function RevenueAnalytics() {
                         {revenueData.map((row) => (
                           <TableRow key={row.period}>
                             <TableCell>{row.period}</TableCell>
-                            <TableCell className="text-right">€{row.premium.toFixed(2)}</TableCell>
-                            <TableCell className="text-right">€{row.standalone.toFixed(2)}</TableCell>
-                            <TableCell className="text-right">€{row.personal_training.toFixed(2)}</TableCell>
-                            <TableCell className="text-right">€{row.corporate.toFixed(2)}</TableCell>
+                            <TableCell className="text-right">€{row.premium_membership.toFixed(2)}</TableCell>
+                            <TableCell className="text-right">€{row.standalone_workout.toFixed(2)}</TableCell>
+                            <TableCell className="text-right">€{row.standalone_program.toFixed(2)}</TableCell>
+                            <TableCell className="text-right">€{row.other_smartygym.toFixed(2)}</TableCell>
                             <TableCell className="text-right font-bold">€{row.total.toFixed(2)}</TableCell>
                           </TableRow>
                         ))}
                         <TableRow className="bg-muted/50 font-bold">
                           <TableCell>Total</TableCell>
-                          <TableCell className="text-right">€{totals.premium.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">€{totals.standalone.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">€{totals.personal_training.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">€{totals.corporate.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">€{totals.premium_membership.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">€{totals.standalone_workout.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">€{totals.standalone_program.toFixed(2)}</TableCell>
+                          <TableCell className="text-right">€{totals.other_smartygym.toFixed(2)}</TableCell>
                           <TableCell className="text-right">€{totalRevenue.toFixed(2)}</TableCell>
                         </TableRow>
                       </TableBody>
@@ -628,7 +486,7 @@ export function RevenueAnalytics() {
                             <TableHead>Payment</TableHead>
                             <TableHead>Start Date</TableHead>
                             <TableHead>Renewal</TableHead>
-                            <TableHead className="text-right">DB Estimate</TableHead>
+                            <TableHead className="text-right">Stripe Revenue</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -636,8 +494,8 @@ export function RevenueAnalytics() {
                             <TableRow key={sub.id} className={!sub.is_paid ? "opacity-60" : ""}>
                               <TableCell className="font-medium">{sub.user_email}</TableCell>
                               <TableCell>
-                                <span className={`px-2 py-1 rounded text-xs ${sub.plan_type === "platinum" ? "bg-purple-100 text-purple-800" : "bg-primary/20 text-primary"}`}>
-                                  {sub.plan_type.charAt(0).toUpperCase() + sub.plan_type.slice(1)}
+                                <span className="px-2 py-1 rounded text-xs bg-primary/20 text-primary">
+                                  {sub.plan_type}
                                 </span>
                               </TableCell>
                               <TableCell>
@@ -646,7 +504,7 @@ export function RevenueAnalytics() {
                                 ) : (
                                   <Badge variant="outline" className="text-orange-600 border-orange-600">
                                     <AlertCircle className="h-3 w-3 mr-1" />
-                                    Free/Manual
+                                    Manual Access
                                   </Badge>
                                 )}
                               </TableCell>
@@ -699,9 +557,7 @@ export function RevenueAnalytics() {
                               <TableCell>{purchase.content_name}</TableCell>
                               <TableCell>
                                 <span className={`px-2 py-1 rounded text-xs ${
-                                  purchase.content_type === "personal_training" 
-                                    ? "bg-blue-100 text-blue-800" 
-                                    : purchase.content_type === "workout"
+                                  purchase.content_type === "workout"
                                     ? "bg-green-100 text-green-800"
                                     : "bg-purple-100 text-purple-800"
                                 }`}>
@@ -720,67 +576,6 @@ export function RevenueAnalytics() {
               </Card>
             </TabsContent>
 
-            {/* Corporate Tab */}
-            <TabsContent value="corporate" className="space-y-4">
-              <Card>
-                <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5" />
-                    <CardTitle className="text-sm">Corporate Subscriptions</CardTitle>
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => exportToCSV(corporateDetails, "corporate")}>
-                    <Download className="h-4 w-4 mr-1" /> Export CSV
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  {corporateDetails.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-8">No corporate subscriptions in selected period</p>
-                  ) : (
-                    <div className="overflow-x-auto">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Organization</TableHead>
-                            <TableHead>Plan</TableHead>
-                            <TableHead>Users</TableHead>
-                            <TableHead>Payment</TableHead>
-                            <TableHead>Renewal</TableHead>
-                            <TableHead className="text-right">Revenue</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {corporateDetails.map((corp) => (
-                            <TableRow key={corp.id} className={!corp.is_paid ? "opacity-60" : ""}>
-                              <TableCell className="font-medium">{corp.organization_name}</TableCell>
-                              <TableCell>
-                                <span className="px-2 py-1 rounded text-xs bg-primary/20 text-primary">
-                                  Smarty {corp.plan_type.charAt(0).toUpperCase() + corp.plan_type.slice(1)}
-                                </span>
-                              </TableCell>
-                              <TableCell>{corp.current_users_count}/{corp.max_users}</TableCell>
-                              <TableCell>
-                                {corp.is_paid ? (
-                                  <Badge variant="default" className="bg-green-600">Paid</Badge>
-                                ) : (
-                                  <Badge variant="outline" className="text-orange-600 border-orange-600">
-                                    <AlertCircle className="h-3 w-3 mr-1" />
-                                    Complimentary
-                                  </Badge>
-                                )}
-                              </TableCell>
-                              <TableCell>{new Date(corp.current_period_end).toLocaleDateString()}</TableCell>
-                              <TableCell className="text-right font-medium">
-                                €0.00
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>

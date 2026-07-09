@@ -21,6 +21,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { UserDetailModal } from "./UserDetailModal";
+import {
+  CURRENT_PREMIUM_PLAN_TYPES,
+  isCurrentPremiumAccess,
+  isCurrentPremiumSubscription,
+  isManualPremiumAccess,
+  normalizePlanLabel,
+} from "@/lib/admin-analytics";
 
 interface UserData {
   user_id: string;
@@ -48,9 +55,7 @@ interface SubscriptionAction {
   planType: 'lifetime' | 'free';
 }
 
-// Any active paid/granted plan tier — legacy gold/platinum rows still exist in
-// the DB so we treat them as Premium for display purposes.
-const PREMIUM_PLAN_TYPES = new Set(['lifetime', 'premium', 'gold', 'platinum']);
+const PREMIUM_PLAN_TYPES = CURRENT_PREMIUM_PLAN_TYPES;
 
 interface CorporateInfo {
   adminPlanType: string | null;
@@ -99,11 +104,8 @@ export function UsersManager() {
     if (user.stripe_subscription_id && periodEnded && user.status !== 'active') return 'Expired';
     if (user.stripe_subscription_id && periodEnded && user.status === 'active') return 'Needs Sync';
     
-    // Active subscription
-    if (user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type)) {
-      if (user.stripe_status === 'trialing') return 'Trial';
-      return 'Paying';
-    }
+    if (isCurrentPremiumSubscription(user as any)) return 'Paid Premium';
+    if (isManualPremiumAccess(user as any)) return 'Manual Access';
     
     // Expired / canceled
     if (user.status === 'canceled' || user.status === 'expired') return 'Expired';
@@ -116,8 +118,8 @@ export function UsersManager() {
 
   const getStatusBadgeVariant = (statusLabel: string) => {
     switch (statusLabel) {
-      case 'Trial': return 'default';
-      case 'Paying': return 'default';
+      case 'Paid Premium': return 'default';
+      case 'Manual Access': return 'secondary';
       case 'Purchase Only': return 'secondary';
       case 'Revoked': return 'outline';
       case 'Needs Sync': return 'destructive';
@@ -128,8 +130,8 @@ export function UsersManager() {
 
   const getStatusBadgeClassName = (statusLabel: string) => {
     switch (statusLabel) {
-      case 'Trial': return 'bg-blue-600 text-white hover:bg-blue-700';
-      case 'Paying': return 'bg-green-600 text-white hover:bg-green-700';
+      case 'Paid Premium': return 'bg-green-600 text-white hover:bg-green-700';
+      case 'Manual Access': return 'bg-purple-600 text-white hover:bg-purple-700';
       case 'Revoked': return 'bg-orange-500 text-white hover:bg-orange-600';
       default: return '';
     }
@@ -323,14 +325,17 @@ export function UsersManager() {
       if (planFilter === "corporate") {
         filtered = filtered.filter(user => corporateInfo[user.user_id]?.adminPlanType || corporateInfo[user.user_id]?.memberPlanType);
       } else if (planFilter === "premium") {
-        // Granted premium rows use legacy plan types (lifetime/gold/platinum)
-        filtered = filtered.filter(user => user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type));
+        filtered = filtered.filter(user => isCurrentPremiumAccess(user as any));
+      } else if (planFilter === "paid_premium") {
+        filtered = filtered.filter(user => isCurrentPremiumSubscription(user as any));
+      } else if (planFilter === "manual_access") {
+        filtered = filtered.filter(user => isManualPremiumAccess(user as any));
       } else if (planFilter === "free") {
-        filtered = filtered.filter(user => !(user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type)) && !(corporateInfo[user.user_id]?.adminPlanType || corporateInfo[user.user_id]?.memberPlanType));
+        filtered = filtered.filter(user => !isCurrentPremiumAccess(user as any) && !(corporateInfo[user.user_id]?.adminPlanType || corporateInfo[user.user_id]?.memberPlanType));
       } else if (planFilter === "purchase") {
         filtered = filtered.filter(user =>
           userPurchases.includes(user.user_id) &&
-          !(user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type))
+          !isCurrentPremiumAccess(user as any)
         );
       } else {
         filtered = filtered.filter(user => user.plan_type === planFilter);
@@ -343,8 +348,8 @@ export function UsersManager() {
         const hasPurchases = userPurchases.includes(user.user_id);
         const label = getUserStatus(user, hasPurchases);
         switch (statusFilter) {
-          case "trial": return label === 'Trial';
-          case "paying": return label === 'Paying';
+          case "paid_premium": return label === 'Paid Premium';
+          case "manual_access": return label === 'Manual Access';
           case "expired": return label === 'Expired';
           case "revoked": return label === 'Revoked';
           case "free": return label === 'Free';
@@ -378,7 +383,7 @@ export function UsersManager() {
     if (sourceFilter !== "all") {
       switch (sourceFilter) {
         case "stripe":
-          filtered = filtered.filter(user => user.stripe_subscription_id);
+          filtered = filtered.filter(user => isCurrentPremiumSubscription(user as any));
           break;
         case "admin_grant":
           filtered = filtered.filter(user => user.subscription_source === 'admin_grant');
@@ -413,7 +418,7 @@ export function UsersManager() {
         });
         break;
       case 'plan_tier': {
-        const tierOrder: Record<string, number> = { lifetime: 0, premium: 0, platinum: 0, gold: 0, free: 2 };
+        const tierOrder: Record<string, number> = { premium: 0, legacy_premium: 0, lifetime: 0, platinum: 0, gold: 0, free: 2 };
         sorted.sort((a, b) => (tierOrder[a.plan_type] ?? 3) - (tierOrder[b.plan_type] ?? 3));
         break;
       }
@@ -424,19 +429,13 @@ export function UsersManager() {
 
   // --- Stats ---
   const stats = useMemo(() => {
-    let trialCount = 0;
-    let payingCount = 0;
-    users.forEach(u => {
-      if (u.status === 'active' && PREMIUM_PLAN_TYPES.has(u.plan_type)) {
-        if (u.stripe_status === 'trialing') trialCount++;
-        else payingCount++;
-      }
-    });
+    const paidPremiumCount = users.filter(u => isCurrentPremiumSubscription(u as any)).length;
+    const manualAccessCount = users.filter(u => isManualPremiumAccess(u as any)).length;
     return {
       total: users.length,
-      trial: trialCount,
-      paying: payingCount,
-      premium: users.filter(u => u.status === 'active' && PREMIUM_PLAN_TYPES.has(u.plan_type)).length,
+      paidPremium: paidPremiumCount,
+      manualAccess: manualAccessCount,
+      premium: paidPremiumCount + manualAccessCount,
       purchases: userPurchases.length,
       admins: Object.values(userRoles).filter(roles => roles.includes('admin')).length,
     };
@@ -450,7 +449,7 @@ export function UsersManager() {
       user.full_name || '',
       user.email || '',
       userRoles[user.user_id]?.includes('admin') ? 'Yes' : 'No',
-      user.plan_type,
+      normalizePlanLabel(user as any),
       getUserStatus(user, userPurchases.includes(user.user_id)),
       user.stripe_status || '',
       user.current_period_start ? format(new Date(user.current_period_start), 'yyyy-MM-dd') : '',
@@ -481,12 +480,11 @@ export function UsersManager() {
   };
 
   const getPlanLabel = (plan: string) => {
-    if (PREMIUM_PLAN_TYPES.has(plan)) return 'Premium';
-    return plan.charAt(0).toUpperCase() + plan.slice(1);
+    return normalizePlanLabel({ plan_type: plan, status: PREMIUM_PLAN_TYPES.has(plan) ? 'active' : 'free' } as any);
   };
 
   const isActivePremium = (user: UserData) => {
-    return user.status === 'active' && PREMIUM_PLAN_TYPES.has(user.plan_type);
+    return isCurrentPremiumAccess(user as any);
   };
 
   const getDialogTitle = () => {
@@ -500,7 +498,7 @@ export function UsersManager() {
   const getDialogDescription = () => {
     if (!pendingAction) return '';
     if (pendingAction.action === 'grant') {
-      return `Are you sure you want to grant PREMIUM membership to "${pendingAction.userName}"? This will give them full premium access as a complimentary manual grant — not counted as paid revenue.`;
+      return `Are you sure you want to grant Premium access to "${pendingAction.userName}"? This gives full access as a manual admin grant and is not counted as paid revenue.`;
     }
     return `Are you sure you want to revoke premium access from "${pendingAction.userName}"? This will set them to the FREE plan and remove their premium benefits.`;
   };
@@ -652,7 +650,9 @@ export function UsersManager() {
               <SelectContent>
                 <SelectItem value="all">All Plans</SelectItem>
                 <SelectItem value="free">Free</SelectItem>
-                <SelectItem value="premium">Premium</SelectItem>
+                <SelectItem value="paid_premium">Paid Premium</SelectItem>
+                <SelectItem value="manual_access">Manual Access</SelectItem>
+                <SelectItem value="premium">All Premium Access</SelectItem>
                 <SelectItem value="purchase">Standalone Purchase</SelectItem>
                 <SelectItem value="corporate">Corporate</SelectItem>
               </SelectContent>
@@ -663,8 +663,8 @@ export function UsersManager() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="trial">🔵 Trial</SelectItem>
-                <SelectItem value="paying">🟢 Paying</SelectItem>
+                <SelectItem value="paid_premium">🟢 Paid Premium</SelectItem>
+                <SelectItem value="manual_access">🟣 Manual Access</SelectItem>
                 <SelectItem value="expired">🔴 Expired</SelectItem>
                 <SelectItem value="revoked">🟠 Revoked</SelectItem>
                 <SelectItem value="free">⚪ Free</SelectItem>
@@ -692,8 +692,8 @@ export function UsersManager() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Sources</SelectItem>
-                <SelectItem value="stripe">Stripe (Paid)</SelectItem>
-                <SelectItem value="admin_grant">Admin Granted</SelectItem>
+                <SelectItem value="stripe">Stripe Paid</SelectItem>
+                <SelectItem value="admin_grant">Manual Access</SelectItem>
                 <SelectItem value="corporate">Corporate</SelectItem>
               </SelectContent>
             </Select>
@@ -726,18 +726,18 @@ export function UsersManager() {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-7 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 mb-6">
             <div className="bg-muted/50 p-3 rounded-lg">
               <p className="text-xs text-muted-foreground">Total Users</p>
               <p className="text-2xl font-bold">{stats.total}</p>
             </div>
-            <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg">
-              <p className="text-xs text-muted-foreground">Trial</p>
-              <p className="text-2xl font-bold text-blue-600">{stats.trial}</p>
-            </div>
             <div className="bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">
-              <p className="text-xs text-muted-foreground">Paying</p>
-              <p className="text-2xl font-bold text-green-600">{stats.paying}</p>
+              <p className="text-xs text-muted-foreground">Paid Premium</p>
+              <p className="text-2xl font-bold text-green-600">{stats.paidPremium}</p>
+            </div>
+            <div className="bg-purple-50 dark:bg-purple-950/30 p-3 rounded-lg">
+              <p className="text-xs text-muted-foreground">Manual Access</p>
+              <p className="text-2xl font-bold text-purple-600">{stats.manualAccess}</p>
             </div>
             <div className="bg-muted/50 p-3 rounded-lg">
               <p className="text-xs text-muted-foreground">Premium</p>
@@ -805,7 +805,7 @@ export function UsersManager() {
                           <>
                             <Badge variant={getPlanBadgeVariant(user.plan_type)} className="text-xs">{getPlanLabel(user.plan_type)}</Badge>
                             {user.subscription_source === 'admin_grant' && (
-                              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">Complimentary</Badge>
+                              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300">Manual Access</Badge>
                             )}
                             {user.stripe_subscription_id && (
                               <Badge variant="outline" className="text-xs border-green-600 text-green-600">Paid</Badge>
@@ -821,7 +821,7 @@ export function UsersManager() {
                         >
                           {statusLabel}
                         </Badge>
-                        {user.cancel_at_period_end && (statusLabel === 'Paying' || statusLabel === 'Trial') && (
+                        {user.cancel_at_period_end && statusLabel === 'Paid Premium' && (
                           <Badge variant="outline" className="text-xs bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20">
                             Cancels at period end
                           </Badge>
@@ -871,7 +871,7 @@ export function UsersManager() {
                       <span>Period End: {user.current_period_end
                         ? format(new Date(user.current_period_end), 'MMM d, yyyy')
                         : user.subscription_source === 'admin_grant' && PREMIUM_PLAN_TYPES.has(user.plan_type)
-                          ? 'Lifetime'
+                          ? 'Manual access'
                           : 'N/A'}</span>
                       <span>Subscribed: {user.subscription_created_at && user.plan_type !== 'free'
                         ? format(new Date(user.subscription_created_at), 'MMM d, yyyy')
