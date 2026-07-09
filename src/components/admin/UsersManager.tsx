@@ -53,6 +53,7 @@ interface SubscriptionAction {
   userName: string;
   action: 'grant' | 'revoke';
   planType: 'lifetime' | 'free';
+  durationMonths?: number | null; // null/undefined = indefinite
 }
 
 const PREMIUM_PLAN_TYPES = CURRENT_PREMIUM_PLAN_TYPES;
