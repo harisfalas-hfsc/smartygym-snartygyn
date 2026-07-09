@@ -16,6 +16,7 @@ import { User as SupabaseUser } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import smartyGymLogo from "@/assets/smarty-gym-logo.png";
 import smartyGymIcon from "@/assets/smarty-gym-icon.png";
+import smartyGymIconTransparent from "@/assets/smarty-gym-icon-transparent.png";
 import harisPhoto from "@/assets/haris-falas-coach.png";
 import { MobilePhoneIllustration } from "@/components/MobilePhoneIllustration";
 import { useIsMobile } from "@/hooks/use-mobile";
