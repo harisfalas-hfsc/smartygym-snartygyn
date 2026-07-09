@@ -152,9 +152,17 @@ serve(async (req) => {
         status: activeSubscription.status 
       });
       
-      // Get subscription details
-      const periodEnd = activeSubscription.current_period_end;
-      const periodStart = activeSubscription.current_period_start;
+      // Get subscription details.
+      // NOTE: Stripe API 2025-08-27.basil moved current_period_* to the
+      // subscription-item level. Fall back to the item's values when the
+      // top-level fields are missing so we don't write NULLs to our DB.
+      const firstItem: any = activeSubscription.items?.data?.[0];
+      const periodEnd = (activeSubscription as any).current_period_end
+        ?? firstItem?.current_period_end
+        ?? null;
+      const periodStart = (activeSubscription as any).current_period_start
+        ?? firstItem?.current_period_start
+        ?? null;
       
       if (periodEnd && typeof periodEnd === 'number') {
         subscriptionEnd = new Date(periodEnd * 1000).toISOString();
