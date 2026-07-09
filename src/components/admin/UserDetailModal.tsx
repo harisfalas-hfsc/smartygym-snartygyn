@@ -70,6 +70,16 @@ interface Purchase {
   purchased_at: string;
 }
 
+interface StripeInvoice {
+  id: string;
+  number: string | null;
+  amount_paid: number;
+  currency: string;
+  created: number;
+  description: string;
+  hosted_invoice_url: string | null;
+}
+
 interface UserDetailModalProps {
   user: UserData | null;
   isOpen: boolean;
@@ -89,6 +99,9 @@ export function UserDetailModal({
 }: UserDetailModalProps) {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [loadingPurchases, setLoadingPurchases] = useState(false);
+  const [stripeInvoices, setStripeInvoices] = useState<StripeInvoice[]>([]);
+  const [stripeFirstSubscribedAt, setStripeFirstSubscribedAt] = useState<string | null>(null);
+  const [loadingStripe, setLoadingStripe] = useState(false);
   const [copied, setCopied] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
@@ -101,6 +114,7 @@ export function UserDetailModal({
   useEffect(() => {
     if (user && isOpen) {
       fetchPurchases();
+      fetchStripeHistory();
       if (corporateInfo?.memberPlanType || corporateInfo?.adminPlanType) {
         fetchCorporateDetails();
       }
@@ -118,10 +132,28 @@ export function UserDetailModal({
         .order('purchased_at', { ascending: false });
       
       setPurchases(data || []);
-    } catch (error) {
-      console.error('Error fetching purchases:', error);
     } finally {
       setLoadingPurchases(false);
+    }
+  };
+
+  const fetchStripeHistory = async () => {
+    if (!user) return;
+    setLoadingStripe(true);
+    setStripeInvoices([]);
+    setStripeFirstSubscribedAt(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-get-stripe-history', {
+        body: { target_user_id: user.user_id }
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setStripeInvoices(data?.invoices || []);
+      setStripeFirstSubscribedAt(data?.first_subscribed_at || null);
+    } catch (e) {
+      console.error('Stripe history fetch failed:', e);
+    } finally {
+      setLoadingStripe(false);
     }
   };
 
@@ -422,9 +454,11 @@ export function UserDetailModal({
                     </div>
                     <div>
                       <p className="text-muted-foreground">First Subscribed</p>
-                      <p>{user.subscription_created_at 
-                        ? format(new Date(user.subscription_created_at), 'MMM d, yyyy')
-                        : 'N/A'}</p>
+                      <p>{stripeFirstSubscribedAt
+                        ? format(new Date(stripeFirstSubscribedAt), 'MMM d, yyyy')
+                        : user.subscription_created_at
+                          ? format(new Date(user.subscription_created_at), 'MMM d, yyyy') + ' (DB)'
+                          : 'N/A'}</p>
                     </div>
                     <div>
                       <p className="text-muted-foreground">Current Plan Since</p>
@@ -514,19 +548,39 @@ export function UserDetailModal({
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
                     <ShoppingBag className="h-4 w-4" />
-                    Purchase History ({purchases.length})
+                    Payment History ({stripeInvoices.length + purchases.length})
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {loadingPurchases ? (
-                    <p className="text-muted-foreground text-sm">Loading...</p>
-                  ) : purchases.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">No purchases found</p>
+                  {(loadingPurchases || loadingStripe) ? (
+                    <p className="text-muted-foreground text-sm">Loading…</p>
+                  ) : stripeInvoices.length === 0 && purchases.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">No payments found</p>
                   ) : (
                     <div className="space-y-2">
+                      {stripeInvoices.map((inv) => (
+                        <div
+                          key={inv.id}
+                          className="flex items-center justify-between p-2 bg-muted/50 rounded-lg text-sm"
+                        >
+                          <div>
+                            <p className="font-medium">
+                              {inv.hosted_invoice_url ? (
+                                <a href={inv.hosted_invoice_url} target="_blank" rel="noreferrer" className="underline">
+                                  {inv.description}
+                                </a>
+                              ) : inv.description}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Stripe invoice{inv.number ? ` #${inv.number}` : ''} • {format(new Date(inv.created * 1000), 'MMM d, yyyy')}
+                            </p>
+                          </div>
+                          <Badge variant="default">{inv.currency === 'EUR' ? '€' : inv.currency + ' '}{inv.amount_paid.toFixed(2)}</Badge>
+                        </div>
+                      ))}
                       {purchases.map((purchase) => (
-                        <div 
-                          key={purchase.id} 
+                        <div
+                          key={purchase.id}
                           className="flex items-center justify-between p-2 bg-muted/50 rounded-lg text-sm"
                         >
                           <div>
