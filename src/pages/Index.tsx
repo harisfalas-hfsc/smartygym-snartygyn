@@ -1260,7 +1260,7 @@ const Index = () => {
         <LazySection minHeight="400px" rootMargin="300px">
         <div className="container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6">
           {/* Mission Statement with Cards */}
-          <section className="mb-20 mt-12">
+          <section className="mb-20 mt-12 hidden md:block">
             <div className="relative mb-10 md:mb-14">
               <span aria-hidden="true" className="ghost-headline absolute -top-6 md:-top-10 left-0 right-0 text-center text-[80px] md:text-[160px] hidden sm:block">
                 THE PROMISE
@@ -1379,7 +1379,7 @@ const Index = () => {
         </section>
 
         {/* Core Values Section */}
-        <section className="mb-20">
+        <section className="mb-20 hidden md:block">
           <div className="relative mb-10 md:mb-14">
             <span aria-hidden="true" className="ghost-headline absolute -top-6 md:-top-10 left-0 right-0 text-center text-[80px] md:text-[160px] hidden sm:block">
               VALUES
@@ -1474,7 +1474,7 @@ const Index = () => {
 
         {/* Message from Head Coach */}
         {/* Message from Head Coach */}
-        <section className="mb-20">
+        <section className="mb-20 hidden md:block">
           <div className="relative mb-10 md:mb-14">
             <span aria-hidden="true" className="ghost-headline absolute -top-6 md:-top-10 left-0 right-0 text-center text-[80px] md:text-[160px] hidden sm:block">
               THE COACH
@@ -1552,7 +1552,7 @@ const Index = () => {
 
 
         {/* CTA Section */}
-        <section className="mb-20">
+        <section className="mb-20 hidden md:block">
           <Card className="dark-band border-2 border-primary/30 overflow-hidden relative rounded-2xl">
             <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute top-4 left-1/2 -translate-x-1/2 text-[60px] md:text-[110px] leading-none opacity-40 hidden md:block pointer-events-none whitespace-nowrap">
               JOIN
