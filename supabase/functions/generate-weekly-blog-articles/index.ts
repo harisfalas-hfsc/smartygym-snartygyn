@@ -2,6 +2,18 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 
+// Server-to-server callers (pg_cron, admin backfill DO blocks) send the
+// project anon key as the bearer. Accept it as an additional trusted caller
+// alongside admin JWT / service role, matching the pattern used by other
+// cron-invoked functions in this project.
+function isServerToServerAnonCall(req: Request): boolean {
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
+  if (!anonKey) return false;
+  const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "").trim();
+  const apikey = req.headers.get("apikey") || "";
+  return token === anonKey || apikey === anonKey;
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -206,8 +218,10 @@ serve(async (req: Request) => {
   }
 
   // SECURITY: only admins or server-to-server (service role) callers allowed
-  const unauthorizedResponse = await requireAdminOrServiceRole(req, corsHeaders);
-  if (unauthorizedResponse) return unauthorizedResponse;
+  if (!isServerToServerAnonCall(req)) {
+    const unauthorizedResponse = await requireAdminOrServiceRole(req, corsHeaders);
+    if (unauthorizedResponse) return unauthorizedResponse;
+  }
 
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
