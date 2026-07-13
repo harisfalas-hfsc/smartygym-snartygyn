@@ -966,6 +966,7 @@ const Index = () => {
                   title: 'Featured Workouts',
                   icon: Dumbbell,
                   cta: 'Explore all workouts',
+                  image: heroWorkoutsImage,
                   items: (latestWorkouts as WorkoutData[]).slice(0, 3).map((w) => ({
                     id: w.id,
                     title: w.name,
@@ -980,6 +981,7 @@ const Index = () => {
                   title: 'Featured Programs',
                   icon: Calendar,
                   cta: 'Explore all programs',
+                  image: heroProgramsImage,
                   items: (latestPrograms as VisibleProgramMetadata[]).slice(0, 3).map((p) => ({
                     id: p.id,
                     title: p.name,
@@ -994,6 +996,7 @@ const Index = () => {
                   title: 'Featured Blog',
                   icon: FileText,
                   cta: 'Read the blog',
+                  image: heroBlogImage,
                   items: (latestArticles as BlogArticleCard[]).slice(0, 3).map((a) => ({
                     id: a.id,
                     title: a.title,
@@ -1008,6 +1011,7 @@ const Index = () => {
                   title: 'Featured Tools',
                   icon: Wrench,
                   cta: 'Open all tools',
+                  image: heroToolsImage,
                   items: [
                     { id: 'timer', title: 'Workout Timer', meta: 'HIIT · Tabata · EMOM', image: heroToolsImage, route: '/tools/workout-timer' },
                     { id: '1rm', title: '1RM Calculator', meta: 'Find your one-rep max', image: heroToolsImage, route: '/tools/1rm-calculator' },
@@ -1018,51 +1022,45 @@ const Index = () => {
                 const SectionIcon = section.icon;
                 return (
                   <div key={section.key} className="flex flex-col">
-                    <div className="flex items-center gap-2 mb-3">
+                    {/* One section hero image */}
+                    <button
+                      type="button"
+                      onClick={() => navigate(section.route)}
+                      className="group relative w-full h-32 md:h-36 rounded-lg overflow-hidden bg-muted mb-3"
+                      aria-label={section.title}
+                    >
+                      <img
+                        src={section.image}
+                        alt={section.title}
+                        loading="lazy"
+                        className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+                      />
+                    </button>
+                    <div className="flex items-center gap-2 mb-2">
                       <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                         <SectionIcon className="w-3.5 h-3.5 text-primary" />
                       </div>
                       <h3 className="text-sm md:text-base font-bold text-foreground leading-tight">{section.title}</h3>
                     </div>
-                    <div className="flex flex-col gap-2.5 flex-1">
+                    {/* Three text links, no per-item pictures */}
+                    <ul className="flex flex-col gap-1.5 flex-1">
                       {section.items.length > 0 ? section.items.map((item) => (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={() => navigate(item.route)}
-                          className="group flex items-stretch text-left bg-background border border-border/60 rounded-lg overflow-hidden hover:border-primary/60 hover:shadow-md transition-all"
-                          aria-label={item.title}
-                        >
-                          <div className="relative w-16 md:w-20 h-14 md:h-16 flex-shrink-0 bg-muted overflow-hidden">
-                            <img
-                              src={item.image}
-                              alt={item.title}
-                              loading="lazy"
-                              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0 px-2.5 py-2 flex flex-col justify-center">
-                            <h4 className={cn(
-                              "text-[12px] md:text-[13px] font-semibold text-foreground leading-tight",
-                              section.key === 'blog' ? "truncate" : "line-clamp-2"
-                            )}>{item.title}</h4>
-                            {item.meta && (
-                              <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{item.meta}</p>
-                            )}
-                          </div>
-                        </button>
+                        <li key={item.id}>
+                          <button
+                            type="button"
+                            onClick={() => navigate(item.route)}
+                            className="group w-full text-left flex items-start gap-1.5 text-[13px] text-foreground hover:text-primary transition-colors"
+                          >
+                            <ChevronRight className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
+                            <span className="line-clamp-2 group-hover:underline leading-snug">{item.title}</span>
+                          </button>
+                        </li>
                       )) : (
                         Array.from({ length: 3 }).map((_, i) => (
-                          <div key={i} className="flex items-stretch bg-background border border-border/60 rounded-lg overflow-hidden">
-                            <div className="w-16 md:w-20 h-14 bg-muted animate-pulse flex-shrink-0" />
-                            <div className="flex-1 px-2.5 py-2 space-y-1">
-                              <div className="h-3 w-3/4 bg-muted animate-pulse rounded" />
-                              <div className="h-2 w-1/2 bg-muted animate-pulse rounded" />
-                            </div>
-                          </div>
+                          <li key={i} className="h-4 w-3/4 bg-muted animate-pulse rounded" />
                         ))
                       )}
-                    </div>
+                    </ul>
                     <button
                       type="button"
                       onClick={() => navigate(section.route)}
