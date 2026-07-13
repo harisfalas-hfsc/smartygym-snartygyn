@@ -1030,10 +1030,10 @@ const Index = () => {
                           key={item.id}
                           type="button"
                           onClick={() => navigate(item.route)}
-                          className="group flex flex-col text-left bg-background border border-border/60 rounded-lg overflow-hidden hover:border-primary/60 hover:shadow-md transition-all"
+                          className="group flex items-stretch text-left bg-background border border-border/60 rounded-lg overflow-hidden hover:border-primary/60 hover:shadow-md transition-all"
                           aria-label={item.title}
                         >
-                          <div className="relative w-full aspect-[16/10] flex-shrink-0 bg-muted overflow-hidden">
+                          <div className="relative w-16 md:w-20 h-14 md:h-16 flex-shrink-0 bg-muted overflow-hidden">
                             <img
                               src={item.image}
                               alt={item.title}
@@ -1041,8 +1041,11 @@ const Index = () => {
                               className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
                           </div>
-                          <div className="min-w-0 px-2.5 py-2">
-                            <h4 className="text-[12px] md:text-[13px] font-semibold text-foreground leading-tight line-clamp-2">{item.title}</h4>
+                          <div className="flex-1 min-w-0 px-2.5 py-2 flex flex-col justify-center">
+                            <h4 className={cn(
+                              "text-[12px] md:text-[13px] font-semibold text-foreground leading-tight",
+                              section.key === 'blog' ? "truncate" : "line-clamp-2"
+                            )}>{item.title}</h4>
                             {item.meta && (
                               <p className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">{item.meta}</p>
                             )}
@@ -1050,9 +1053,9 @@ const Index = () => {
                         </button>
                       )) : (
                         Array.from({ length: 3 }).map((_, i) => (
-                          <div key={i} className="flex flex-col bg-background border border-border/60 rounded-lg overflow-hidden">
-                            <div className="w-full aspect-[16/10] bg-muted animate-pulse" />
-                            <div className="px-2.5 py-2 space-y-1">
+                          <div key={i} className="flex items-stretch bg-background border border-border/60 rounded-lg overflow-hidden">
+                            <div className="w-16 md:w-20 h-14 bg-muted animate-pulse flex-shrink-0" />
+                            <div className="flex-1 px-2.5 py-2 space-y-1">
                               <div className="h-3 w-3/4 bg-muted animate-pulse rounded" />
                               <div className="h-2 w-1/2 bg-muted animate-pulse rounded" />
                             </div>
