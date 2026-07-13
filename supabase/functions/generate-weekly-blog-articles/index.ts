@@ -2,6 +2,18 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 
+// Server-to-server callers (pg_cron, admin backfill DO blocks) send the
+// project anon key as the bearer. Accept it as an additional trusted caller
+// alongside admin JWT / service role, matching the pattern used by other
+// cron-invoked functions in this project.
+function isServerToServerAnonCall(req: Request): boolean {
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY") || "";
+  if (!anonKey) return false;
+  const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "").trim();
+  const apikey = req.headers.get("apikey") || "";
+  return token === anonKey || apikey === anonKey;
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -206,8 +218,10 @@ serve(async (req: Request) => {
   }
 
   // SECURITY: only admins or server-to-server (service role) callers allowed
-  const unauthorizedResponse = await requireAdminOrServiceRole(req, corsHeaders);
-  if (unauthorizedResponse) return unauthorizedResponse;
+  if (!isServerToServerAnonCall(req)) {
+    const unauthorizedResponse = await requireAdminOrServiceRole(req, corsHeaders);
+    if (unauthorizedResponse) return unauthorizedResponse;
+  }
 
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -220,7 +234,18 @@ serve(async (req: Request) => {
 
     const results: { category: string; title: string; slug: string; status: string }[] = [];
 
-    for (const category of CATEGORIES) {
+    // Optional body override: { categories: ["Wellness"] } to backfill a single category.
+    let requestedCategories: string[] = CATEGORIES;
+    try {
+      if (req.headers.get("content-type")?.includes("application/json")) {
+        const body = await req.json();
+        if (Array.isArray(body?.categories) && body.categories.length > 0) {
+          requestedCategories = body.categories.filter((c: string) => CATEGORIES.includes(c));
+        }
+      }
+    } catch { /* no body — use all */ }
+
+    for (const category of requestedCategories) {
       try {
         console.log(`\n=== Generating ${category} article ===`);
 
@@ -282,45 +307,57 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
   "content": "<p>Your full HTML article content here...</p>"
 }`;
 
-        const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-pro",
-            messages: [
-              { role: "system", content: "You are a professional fitness blog content writer. Always respond with valid JSON only, no markdown formatting." },
-              { role: "user", content: prompt }
-            ],
-          }),
-        });
+        // Up to 2 retries (3 total attempts) on AI/parse/empty errors so a
+        // single transient hiccup can't silently drop the category's article.
+        let parsed: { title: string; excerpt: string; content: string } | null = null;
+        let lastFailure = "unknown";
+        for (let attempt = 1; attempt <= 3; attempt++) {
+          const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-pro",
+              messages: [
+                { role: "system", content: "You are a professional fitness blog content writer. Always respond with valid JSON only, no markdown formatting." },
+                { role: "user", content: prompt }
+              ],
+            }),
+          });
 
-        if (!aiResponse.ok) {
-          const errText = await aiResponse.text();
-          console.error(`AI error for ${category}:`, aiResponse.status, errText);
-          results.push({ category, title: "", slug: "", status: `AI error: ${aiResponse.status}` });
-          continue;
+          if (!aiResponse.ok) {
+            const errText = await aiResponse.text();
+            console.error(`AI error for ${category} (attempt ${attempt}/3):`, aiResponse.status, errText);
+            lastFailure = `AI error: ${aiResponse.status}`;
+            await new Promise(r => setTimeout(r, 3000 * attempt));
+            continue;
+          }
+
+          const aiData = await aiResponse.json();
+          let responseText = aiData.choices?.[0]?.message?.content || "";
+          responseText = responseText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
+
+          try {
+            const candidate = JSON.parse(responseText);
+            if (!candidate?.title || !candidate?.content) {
+              lastFailure = "Missing title or content";
+              console.error(`Missing fields for ${category} (attempt ${attempt}/3)`);
+              await new Promise(r => setTimeout(r, 3000 * attempt));
+              continue;
+            }
+            parsed = candidate;
+            break;
+          } catch (parseError) {
+            console.error(`JSON parse error for ${category} (attempt ${attempt}/3):`, responseText.substring(0, 200));
+            lastFailure = "JSON parse error";
+            await new Promise(r => setTimeout(r, 3000 * attempt));
+          }
         }
 
-        const aiData = await aiResponse.json();
-        let responseText = aiData.choices?.[0]?.message?.content || "";
-        
-        // Clean up response - remove markdown code blocks if present
-        responseText = responseText.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
-
-        let parsed: { title: string; excerpt: string; content: string };
-        try {
-          parsed = JSON.parse(responseText);
-        } catch (parseError) {
-          console.error(`JSON parse error for ${category}:`, responseText.substring(0, 200));
-          results.push({ category, title: "", slug: "", status: "JSON parse error" });
-          continue;
-        }
-
-        if (!parsed.title || !parsed.content) {
-          results.push({ category, title: "", slug: "", status: "Missing title or content" });
+        if (!parsed) {
+          results.push({ category, title: "", slug: "", status: `Failed after 3 attempts: ${lastFailure}` });
           continue;
         }
 
