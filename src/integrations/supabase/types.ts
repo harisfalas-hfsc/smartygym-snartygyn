@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      _vault_names_debug: {
+        Row: {
+          len: number | null
+          name: string | null
+          prefix: string | null
+        }
+        Insert: {
+          len?: number | null
+          name?: string | null
+          prefix?: string | null
+        }
+        Update: {
+          len?: number | null
+          name?: string | null
+          prefix?: string | null
+        }
+        Relationships: []
+      }
       admin_training_programs: {
         Row: {
           category: string
