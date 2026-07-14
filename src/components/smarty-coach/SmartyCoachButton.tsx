@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { SmartyCoachModal } from "./SmartyCoachModal";
 import { cn } from "@/lib/utils";
-import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
+import smartyCoachIcon from "@/assets/smarty-gym-icon-noborder.png";
 import {
   Tooltip,
   TooltipContent,
@@ -105,7 +105,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
             }}
             aria-label="Smarty Coach"
           >
-            <img src={smartyCoachIcon} alt="Smarty Coach" className="h-14 w-14 rounded-full" loading="lazy" width={55} height={55} />
+            <img src={smartyCoachIcon} alt="Smarty Coach" className="h-14 w-14 rounded-full object-contain p-1" loading="lazy" width={55} height={55} />
           </button>
         </TooltipTrigger>
         <TooltipContent side="left">
