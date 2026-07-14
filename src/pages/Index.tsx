@@ -1020,27 +1020,36 @@ const Index = () => {
                 },
               ]).map((section) => {
                 const SectionIcon = section.icon;
+                const plainTitle = section.title.replace(/^Featured\s+/i, '');
                 return (
                   <div key={section.key} className="flex flex-col">
-                    {/* One section hero image */}
+                    {/* One section hero image with icon + plain title overlay */}
                     <button
                       type="button"
                       onClick={() => navigate(section.route)}
                       className="group relative w-full h-32 md:h-36 rounded-lg overflow-hidden bg-muted mb-3"
-                      aria-label={section.title}
+                      aria-label={plainTitle}
                     >
                       <img
                         src={section.image}
-                        alt={section.title}
+                        alt={plainTitle}
                         loading="lazy"
                         className="absolute inset-0 w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                       />
-                    </button>
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <SectionIcon className="w-3.5 h-3.5 text-primary" />
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent px-3 py-2 md:py-2.5">
+                        <div className="flex items-center gap-2">
+                          <SectionIcon className="w-4 h-4 md:w-5 md:h-5 text-white flex-shrink-0" />
+                          <span className="text-sm md:text-base font-extrabold tracking-tight text-white uppercase">
+                            {plainTitle}
+                          </span>
+                        </div>
                       </div>
-                      <h3 className="text-sm md:text-base font-bold text-foreground leading-tight">{section.title}</h3>
+                    </button>
+                    {/* Highlighted featured title, no icon */}
+                    <div className="mb-2 pl-2 border-l-4 border-primary">
+                      <h3 className="text-sm md:text-base font-extrabold tracking-tight text-primary uppercase leading-tight">
+                        {section.title}
+                      </h3>
                     </div>
                     {/* Three text links, no per-item pictures */}
                     <ul className="flex flex-col gap-1.5 flex-1">
