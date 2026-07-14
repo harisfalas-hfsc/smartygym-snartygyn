@@ -499,6 +499,7 @@ const About = () => {
             </Card>
           </ScrollReveal>
 
+          </div>
         </div>
       </div>
     </>
