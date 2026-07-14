@@ -289,6 +289,12 @@ export const Navigation = () => {
     { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500", track: undefined, subtitle: "One click away, always." },
   ];
 
+  // Mobile menu moves Smarty Premium to the bottom (below FAQ and Contact).
+  const mobileDiscoveryItems = [
+    ...discoveryItems.filter((item) => item.label !== "Smarty Premium"),
+    ...discoveryItems.filter((item) => item.label === "Smarty Premium"),
+  ];
+
   // Desktop menu replaces "About SmartyGym" with "Home" because the About page
   // is intentionally hidden from desktop (content overlaps with the homepage).
   const desktopDiscoveryItems = discoveryItems.map((item) =>
