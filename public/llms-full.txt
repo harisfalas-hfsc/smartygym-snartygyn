@@ -1,6 +1,6 @@
 # SmartyGym — Full Knowledge File for AI Systems
 # URL: https://smartygym.com
-# Generated: 2026-07-14T03:32:55.705Z
+# Generated: 2026-07-14T06:13:08.026Z
 # Source: live database (auto-regenerated on every publish)
 #
 # This file gives ChatGPT, Claude, Gemini, Grok, Perplexity, Copilot and
@@ -880,7 +880,7 @@ Sleep is the most underrated performance enhancer available. While you focus on 
 
 ---
 
-## Workouts (533 visible)
+## Workouts (534 visible)
 
 - Total Body Anchor (STRENGTH, Beginner, 45 min, REPS & SETS) — This beginner-friendly full-body strength workout focuses on fundamental movement patterns using gym equipment. Build a solid foundation by prioritizing proper form and controlled movements. You'll engage all major muscle groups,…
 - Kinetic Sprout (METABOLIC, Intermediate, 35 min, CIRCUIT) — Boost your metabolism and elevate your fitness with this intermediate-level circuit workout. Combining strength and conditioning, this full-body metabolic blast will leave you feeling energized and strong.
@@ -938,6 +938,7 @@ Sleep is the most underrated performance enhancer available. While you focus on 
 - Iron Current (STRENGTH, Advanced, 45 min, REPS & SETS) — This advanced strength workout focuses on integrating full-body strength and stability. Expect a challenging sequence designed to enhance your functional power and muscular endurance. Prepare to push your limits and refine your technique…
 - Ironclad Core & Power (STRENGTH, Advanced, 45 min, REPS & SETS) — Haris Falas, your Sports Scientist, presents a premium strength workout designed for SmartyGym's advanced members. This session, focused on building absolute strength and muscle hypertrophy, utilizes controlled movements and specific rest…
 - Bodyweight Challenge Session (CHALLENGE, Advanced, 45 min, CIRCUIT) — This advanced bodyweight circuit is designed to challenge your endurance and muscular fortitude. Expect a relentless pace, demanding full-body engagement across every movement. You will cycle through a series of complex exercises, pushing…
+- Kinetic Pulse Circuit Blast (CALORIE BURNING, Intermediate, Various, CIRCUIT) — This high-output conditioning session utilizes explosive plyometrics and multi-planar movements to maximize metabolic demand. By maintaining a high heart rate through continuous intermediate transitions, you will optimize caloric…
 - Peak Drive Test (CHALLENGE, Intermediate, 35 min, FOR TIME) — This challenge workout is designed to push your limits and test your mental and physical fortitude. It's not just about strength; it's about sustaining effort and maintaining form under pressure. Get ready to face a true proving ground.…
 - Granite Pulse (CHALLENGE, Intermediate, 35 min, TABATA) — This Challenge workout brings the intensity with an Equipment Tabata format, targeting your entire body. Prepare for rapid-fire rounds designed to push your limits and build resilience. You'll alternate between periods of high-intensity…
 - Foundation Squat & Row (STRENGTH, Beginner, 45 min, REPS & SETS) — This beginner-friendly workout focuses on building a solid foundation in lower body pushing and upper body pulling movements using only your bodyweight. It emphasizes proper form and controlled repetitions to establish strength and muscle…
@@ -1419,7 +1420,7 @@ Sleep is the most underrated performance enhancer available. While you focus on 
 
 ---
 
-## Training Programs (31 visible)
+## Training Programs (32 visible)
 
 ### Mass Domination Protocol
 - Category: MUSCLE HYPERTROPHY
@@ -1636,6 +1637,14 @@ A comprehensive 6-week advanced cardio endurance program designed to take you fr
 - Equipment: Bodyweight
 
 This six-week, bodyweight-only program is the ultimate challenge for the advanced athlete committed to achieving significant weight loss. It is an uncompromising, five-day-a-week plan designed to push you to your absolute limits and redefine your
+
+### Hypertrophy Design
+- Category: MUSCLE HYPERTROPHY
+- Duration: 6 weeks, 6 days/week
+- Difficulty: Advanced
+- Equipment: Equipment
+
+This six-week, high-frequency program is engineered for one purpose: maximizing muscle hypertrophy. It is designed exclusively for the advanced, dedicated lifter who has significant training experience and is ready to commit to a demanding six-day-per-week schedule. We strip away the noise and focus entirely on proven, science-based principles. You will navigate through intelligently structured training splits that ensure each muscle group receives the optimal stimulus for growth and adequate time for recovery. This is a no-nonsense plan for those who are serious about pushing their physical…
 
 ### Muscle Building Basics
 - Category: MUSCLE HYPERTROPHY
