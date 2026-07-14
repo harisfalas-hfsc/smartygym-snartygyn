@@ -495,7 +495,7 @@ export const Navigation = () => {
               <Menu className="h-5 w-5" />
             </button>
           </SheetTrigger>
-          <SheetContent side="left" className="flex w-[320px] flex-col gap-0 border-r-2 border-primary/40 p-3 sm:max-w-[320px]">
+          <SheetContent side="left" className="flex h-full w-[280px] flex-col gap-0 border-r-2 border-primary/40 p-3 sm:max-w-[280px]">
             <SheetClose asChild>
               <Button variant="ghost" className="mb-1 h-8 shrink-0 gap-2 self-start rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
                 <ArrowLeft className="h-3.5 w-3.5" />
@@ -505,7 +505,7 @@ export const Navigation = () => {
             <div className="mb-2 shrink-0">
               <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
             </div>
-            <nav className="flex flex-col gap-0.5 overflow-y-auto">
+            <nav className="flex flex-1 flex-col gap-1 overflow-hidden">
               {desktopDiscoveryItems.map(({ label, path, icon: Icon, iconClass, track, subtitle }) => {
                 const active = location.pathname === path;
                 return (
@@ -514,10 +514,10 @@ export const Navigation = () => {
                     type="button"
                     onClick={() => handleNavigate(path)}
                     data-track-cta={track}
-                    className={`flex w-full items-center gap-2 rounded-lg border px-2 py-1 text-left font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary' : 'border-transparent text-foreground hover:border-primary/30 hover:bg-primary/10'}`}
+                    className={`flex w-full min-h-0 flex-1 items-center gap-3 rounded-lg border px-3 text-left font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary' : 'border-primary/20 text-foreground hover:border-primary/50 hover:bg-primary/10'}`}
                   >
-                    <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
-                      <Icon className="h-4 w-4" />
+                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
+                      <Icon className="h-5 w-5" />
                     </span>
                     <span className="text-sm leading-tight">{label}</span>
                   </button>
