@@ -27,7 +27,7 @@ import { SafeNotificationBadge } from "@/components/NotificationBadge";
 
 import { useAdminRole } from "@/hooks/useAdminRole";
 import { SmartyCoachModal, SmartyCoachButton } from "@/components/smarty-coach";
-import smartyCoachIcon from "@/assets/smarty-coach-icon.png";
+import smartyCoachIcon from "@/assets/smarty-gym-icon-noborder.png";
 import { cn } from "@/lib/utils";
 
 interface SubscriptionInfo {
@@ -370,7 +370,7 @@ export const Navigation = () => {
             aria-label="Smarty Coach"
             className="smarty-coach-blink motion-reduce:animate-none inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary bg-background shadow-[0_2px_8px_-2px_hsl(var(--primary)/0.4)]"
           >
-            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-6 w-6 rounded-full" width={24} height={24} />
+            <img src={smartyCoachIcon} alt="" aria-hidden="true" className="h-6 w-6 rounded-full object-contain" width={24} height={24} />
           </button>
           {user ? (
             <DropdownMenu open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
