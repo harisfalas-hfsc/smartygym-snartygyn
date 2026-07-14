@@ -105,7 +105,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
             }}
             aria-label="Smarty Coach"
           >
-            <img src={smartyCoachIcon} alt="Smarty Coach" className="h-11 w-11 rounded-full" loading="lazy" width={44} height={44} />
+            <img src={smartyCoachIcon} alt="Smarty Coach" className="h-14 w-14 rounded-full" loading="lazy" width={55} height={55} />
           </button>
         </TooltipTrigger>
         <TooltipContent side="left">
