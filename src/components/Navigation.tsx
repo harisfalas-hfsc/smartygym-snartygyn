@@ -326,18 +326,19 @@ export const Navigation = () => {
                 <div className="mb-2 shrink-0">
                   <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
                 </div>
-                <nav className="grid grid-cols-2 gap-2 overflow-y-auto">
+                <nav className="grid grid-cols-2 gap-1.5 overflow-y-auto">
                   {discoveryItems.map(({ label, path, icon: Icon, iconClass }) => {
                     const active = location.pathname === path;
+                    const isPremium = label === "Smarty Premium";
                     return (
                       <button
                         key={path}
                         type="button"
                         onClick={() => handleNavigate(path)}
-                        className={`flex flex-col items-center justify-center rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                        className={`flex flex-col items-center justify-center rounded-2xl border-2 p-1.5 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'} ${isPremium ? 'col-span-2' : ''}`}
                       >
-                        <span className={`mx-auto mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
-                          <Icon className="h-5 w-5" />
+                        <span className={`mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
+                          <Icon className="h-4 w-4" />
                         </span>
                         <span className="block text-xs leading-tight">{label}</span>
                       </button>
