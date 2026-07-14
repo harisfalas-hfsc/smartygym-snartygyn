@@ -495,7 +495,7 @@ export const Navigation = () => {
               <Menu className="h-5 w-5" />
             </button>
           </SheetTrigger>
-          <SheetContent side="left" hideClose className="left-1/2 top-1/2 bottom-auto flex h-auto max-h-[calc(100vh-2rem)] !w-[95vw] !max-w-[1200px] sm:!max-w-[1200px] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border-2 border-primary/40 p-3 shadow-xl !animate-none transition-opacity duration-200 ease-out data-[state=closed]:opacity-0 data-[state=open]:opacity-100">
+          <SheetContent side="left" className="flex w-[320px] flex-col gap-0 border-r-2 border-primary/40 p-3 sm:max-w-[320px]">
             <SheetClose asChild>
               <Button variant="ghost" className="mb-1 h-8 shrink-0 gap-2 self-start rounded-full border-2 border-primary px-3 text-sm text-primary hover:bg-primary hover:text-primary-foreground">
                 <ArrowLeft className="h-3.5 w-3.5" />
@@ -505,7 +505,7 @@ export const Navigation = () => {
             <div className="mb-2 shrink-0">
               <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
             </div>
-            <nav className="flex flex-row flex-nowrap items-stretch gap-2 overflow-x-auto">
+            <nav className="flex flex-col gap-1 overflow-y-auto">
               {desktopDiscoveryItems.map(({ label, path, icon: Icon, iconClass, track, subtitle }) => {
                 const active = location.pathname === path;
                 return (
@@ -514,12 +514,12 @@ export const Navigation = () => {
                     type="button"
                     onClick={() => handleNavigate(path)}
                     data-track-cta={track}
-                    className={`flex min-w-[100px] flex-1 flex-col items-center justify-start rounded-2xl border-2 p-2 text-center font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary shadow-sm' : 'border-primary/25 bg-card text-foreground hover:border-primary hover:bg-primary/10'}`}
+                    className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary' : 'border-transparent text-foreground hover:border-primary/30 hover:bg-primary/10'}`}
                   >
-                    <span className={`mx-auto mb-1 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
-                      <Icon className="h-6 w-6" />
+                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
+                      <Icon className="h-5 w-5" />
                     </span>
-                    <span className="block text-xs leading-tight">{label}</span>
+                    <span className="text-sm leading-tight">{label}</span>
                   </button>
                 );
               })}
