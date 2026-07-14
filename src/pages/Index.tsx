@@ -948,7 +948,7 @@ const Index = () => {
               />
             </div>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
-              Train <span className="text-primary">Smarter,</span> Not <span className="text-green-500">Harder.</span>
+              Your Gym <span className="text-primary">Re-imagined</span>
             </h1>
             <p className="text-sm md:text-base text-muted-foreground mt-4 leading-relaxed">
               Your gym, in your pocket. Expert-designed workouts, structured training programs, blog insights and smart tools — <span className="font-semibold text-foreground">100% Human</span>, <span className="font-semibold text-red-500">0% AI</span>. Designed by Sports Scientist{' '}
