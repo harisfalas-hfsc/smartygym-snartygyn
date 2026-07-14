@@ -285,6 +285,7 @@ export const Navigation = () => {
     { label: "Exercise Library", path: "/exerciselibrary", icon: BookOpen, iconClass: "text-emerald-500", track: undefined },
     { label: "Community", path: "/community", icon: Users, iconClass: "text-cyan-500", track: undefined },
     { label: "FAQ", path: "/faq", icon: HelpCircle, iconClass: "text-purple-500", track: undefined },
+    { label: "Smarty Premium", path: "/premium", icon: Crown, iconClass: "text-yellow-500", track: undefined },
     { label: "Contact", path: "/contact", icon: Mail, iconClass: "text-indigo-500", track: undefined, subtitle: "One click away, always." },
   ];
 
