@@ -1135,7 +1135,7 @@ const Index = () => {
                   </span>
                   <div className="relative pt-6 md:pt-12 text-center">
                     <p className="text-xs md:text-sm font-bold tracking-[0.3em] text-primary uppercase mb-3">Your Fitness Partner</p>
-                    <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase">Your Gym Re-imagined</h2>
+                    <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase">Anywhere, <span className="text-green-500">Anytime</span></h2>
                   </div>
                 </div>
                 <div className="bg-background/60 backdrop-blur-sm p-6 rounded-lg border-2 border-primary/30 text-center">
