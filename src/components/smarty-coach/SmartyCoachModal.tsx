@@ -49,22 +49,22 @@ const MenuCard = ({ emoji, title, description, Icon, accent, onClick }: MenuCard
   <button
     onClick={onClick}
     className={cn(
-      "group relative w-full text-left rounded-xl border-2 border-border bg-card p-2.5",
+      "group relative w-full text-left rounded-xl border-2 border-border bg-card p-2.5 md:p-4",
       "transition-all duration-200 hover:border-primary hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10",
       "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
     )}
   >
-    <div className="flex items-center gap-2.5">
-      <div className={cn("w-9 h-9 min-w-[2.25rem] rounded-lg flex items-center justify-center", menuAccentClasses[accent])}>
-        <Icon className="h-4 w-4" />
+    <div className="flex items-center gap-2.5 md:gap-3">
+      <div className={cn("w-9 h-9 min-w-[2.25rem] md:w-11 md:h-11 md:min-w-[2.75rem] rounded-lg flex items-center justify-center", menuAccentClasses[accent])}>
+        <Icon className="h-4 w-4 md:h-5 md:w-5" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-foreground text-sm leading-tight whitespace-normal break-words">
+        <p className="font-semibold text-foreground text-sm md:text-base leading-tight whitespace-normal break-words">
           <span className="mr-1">{emoji}</span>{title}
         </p>
-        <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug whitespace-normal break-words line-clamp-2">{description}</p>
+        <p className="text-[11px] md:text-xs text-muted-foreground mt-0.5 leading-snug whitespace-normal break-words line-clamp-2">{description}</p>
       </div>
-      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+      <ChevronRight className="h-4 w-4 md:h-5 md:w-5 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
     </div>
   </button>
 );
@@ -285,7 +285,7 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
         className={cn(
           "p-0 border-0 overflow-hidden",
           // Use small/dynamic viewport units for consistent mobile-browser chrome behavior.
-          "w-[calc(100svw-2rem)] max-w-[22rem] sm:max-w-md mx-auto",
+          "w-[calc(100svw-2rem)] max-w-[22rem] sm:max-w-md md:max-w-3xl lg:max-w-4xl mx-auto",
           "max-h-[calc(100svh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] sm:max-h-[85vh] overflow-y-auto overscroll-contain",
           // Re-center vertically using small/dynamic viewport units so the modal
           // is truly centered in the visible area on mobile (where vh != svh).
@@ -317,10 +317,10 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
                   />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-base sm:text-lg font-bold text-foreground leading-tight break-words">
+                  <h2 className="text-base sm:text-lg md:text-2xl font-bold text-foreground leading-tight break-words">
                     Hi <span className="inline-block">👋</span> I'm your Smarty Coach
                   </h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
                     How can I help you today?
                   </p>
                 </div>
@@ -329,8 +329,8 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
             </div>
 
             {/* Menu options */}
-            <div className="px-3 sm:px-4 pb-4 pt-2">
-              <div className="grid grid-cols-1 gap-2 animate-in fade-in duration-300">
+            <div className="px-3 sm:px-4 md:px-6 pb-4 pt-2 md:pt-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 animate-in fade-in duration-300">
                 <MenuCard
                   emoji="🔥"
                   title="Workout of the Day"
