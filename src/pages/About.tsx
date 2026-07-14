@@ -125,6 +125,13 @@ const About = () => {
             { label: "About" }
           ]} />
 
+          {/* Desktop: mirror the homepage content from "Your Gym Re-imagined" and below */}
+          <div className="hidden md:block">
+            <DesktopAboutContent />
+          </div>
+
+          {/* Mobile-only About content (desktop untouched by this wrapper) */}
+          <div className="md:hidden">
           {/* Hero Section (desktop only) */}
           <ScrollReveal>
             <div className="mb-12 text-center hidden md:block">
