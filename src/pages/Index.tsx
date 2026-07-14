@@ -937,9 +937,9 @@ const Index = () => {
         </section>
 
         {/* Desktop hero (SmartyMove-style) */}
-        <section className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-4 md:pt-8 pb-4">
-          <div className="text-center max-w-3xl mx-auto mb-6 md:mb-10">
-            <div className="flex justify-center mb-4">
+        <section className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-2 md:pt-3 pb-2">
+          <div className="text-center max-w-3xl mx-auto mb-4 md:mb-5">
+            <div className="flex justify-center mb-2">
               <img
                 src={smartyGymIconTransparent}
                 alt="SmartyGym"
@@ -950,7 +950,7 @@ const Index = () => {
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
               Your Gym <span className="text-primary">Re-imagined</span>
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-4 leading-relaxed">
+            <p className="text-sm md:text-base text-muted-foreground mt-2 leading-relaxed">
               Your gym, in your pocket. Expert-designed workouts, structured training programs, blog insights and smart tools — <span className="font-semibold text-foreground">100% Human</span>, <span className="font-semibold text-red-500">0% AI</span>. Designed by Sports Scientist{' '}
               <Link to="/coach-profile" className="font-semibold text-primary hover:underline">Haris Falas</Link>.
             </p>
