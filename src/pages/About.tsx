@@ -10,6 +10,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useState, useEffect, useRef } from "react";
+import { DesktopAboutContent } from "@/components/home/DesktopAboutContent";
 
 const About = () => {
   const navigate = useNavigate();
