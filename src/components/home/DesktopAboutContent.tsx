@@ -502,6 +502,8 @@ export const DesktopAboutContent = () => {
             </CardContent>
           </Card>
         </section>
+      </div>
+        </LazySection>
     </>
   );
 };
