@@ -317,10 +317,10 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
                   />
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-base sm:text-lg font-bold text-foreground leading-tight break-words">
+                  <h2 className="text-base sm:text-lg md:text-2xl font-bold text-foreground leading-tight break-words">
                     Hi <span className="inline-block">👋</span> I'm your Smarty Coach
                   </h2>
-                  <p className="text-xs text-muted-foreground mt-0.5">
+                  <p className="text-xs md:text-sm text-muted-foreground mt-0.5">
                     How can I help you today?
                   </p>
                 </div>
