@@ -329,8 +329,8 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
             </div>
 
             {/* Menu options */}
-            <div className="px-3 sm:px-4 pb-4 pt-2">
-              <div className="grid grid-cols-1 gap-2 animate-in fade-in duration-300">
+            <div className="px-3 sm:px-4 md:px-6 pb-4 pt-2 md:pt-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 animate-in fade-in duration-300">
                 <MenuCard
                   emoji="🔥"
                   title="Workout of the Day"
