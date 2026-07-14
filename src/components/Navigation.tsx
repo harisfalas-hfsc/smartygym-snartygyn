@@ -505,7 +505,7 @@ export const Navigation = () => {
             <div className="mb-2 shrink-0">
               <h2 className="text-lg font-bold leading-tight text-foreground">Explore SmartyGym</h2>
             </div>
-            <nav className="flex flex-col gap-1 overflow-y-auto">
+            <nav className="flex flex-col gap-0.5 overflow-y-auto">
               {desktopDiscoveryItems.map(({ label, path, icon: Icon, iconClass, track, subtitle }) => {
                 const active = location.pathname === path;
                 return (
@@ -514,10 +514,10 @@ export const Navigation = () => {
                     type="button"
                     onClick={() => handleNavigate(path)}
                     data-track-cta={track}
-                    className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary' : 'border-transparent text-foreground hover:border-primary/30 hover:bg-primary/10'}`}
+                    className={`flex w-full items-center gap-2 rounded-lg border px-2 py-1 text-left font-semibold transition-all duration-200 ${active ? 'border-primary bg-primary/15 text-primary' : 'border-transparent text-foreground hover:border-primary/30 hover:bg-primary/10'}`}
                   >
-                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
-                      <Icon className="h-5 w-5" />
+                    <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 ${iconClass}`}>
+                      <Icon className="h-4 w-4" />
                     </span>
                     <span className="text-sm leading-tight">{label}</span>
                   </button>
