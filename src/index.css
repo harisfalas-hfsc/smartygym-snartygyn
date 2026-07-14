@@ -1214,6 +1214,26 @@ body {
   }
 }
 
+@keyframes smarty-coach-blink {
+  0%, 90%, 100% { opacity: 1; transform: scale(1); }
+  93% { opacity: 0.35; transform: scale(0.9); }
+  96% { opacity: 1; transform: scale(1.08); }
+}
+
+@layer utilities {
+  .smarty-coach-blink {
+    animation: smarty-coach-blink 3.5s ease-in-out infinite;
+    transform-origin: center;
+    will-change: transform, opacity;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smarty-coach-blink {
+    animation: none;
+  }
+}
+
 /* Fixed top elements need extra top padding */
 .safe-area-top {
   padding-top: calc(var(--sat) + 0.5rem);
