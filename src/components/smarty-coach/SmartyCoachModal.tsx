@@ -49,22 +49,22 @@ const MenuCard = ({ emoji, title, description, Icon, accent, onClick }: MenuCard
   <button
     onClick={onClick}
     className={cn(
-      "group relative w-full text-left rounded-xl border-2 border-border bg-card p-2.5",
+      "group relative w-full text-left rounded-xl border-2 border-border bg-card p-2.5 md:p-4",
       "transition-all duration-200 hover:border-primary hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10",
       "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
     )}
   >
-    <div className="flex items-center gap-2.5">
-      <div className={cn("w-9 h-9 min-w-[2.25rem] rounded-lg flex items-center justify-center", menuAccentClasses[accent])}>
-        <Icon className="h-4 w-4" />
+    <div className="flex items-center gap-2.5 md:gap-3">
+      <div className={cn("w-9 h-9 min-w-[2.25rem] md:w-11 md:h-11 md:min-w-[2.75rem] rounded-lg flex items-center justify-center", menuAccentClasses[accent])}>
+        <Icon className="h-4 w-4 md:h-5 md:w-5" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-foreground text-sm leading-tight whitespace-normal break-words">
+        <p className="font-semibold text-foreground text-sm md:text-base leading-tight whitespace-normal break-words">
           <span className="mr-1">{emoji}</span>{title}
         </p>
-        <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug whitespace-normal break-words line-clamp-2">{description}</p>
+        <p className="text-[11px] md:text-xs text-muted-foreground mt-0.5 leading-snug whitespace-normal break-words line-clamp-2">{description}</p>
       </div>
-      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
+      <ChevronRight className="h-4 w-4 md:h-5 md:w-5 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-transform" />
     </div>
   </button>
 );
