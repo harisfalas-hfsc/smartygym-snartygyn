@@ -10,6 +10,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { PageBreadcrumbs } from "@/components/PageBreadcrumbs";
 import { useState, useEffect, useRef } from "react";
+import { DesktopAboutContent } from "@/components/home/DesktopAboutContent";
 
 const About = () => {
   const navigate = useNavigate();
@@ -124,6 +125,13 @@ const About = () => {
             { label: "About" }
           ]} />
 
+          {/* Desktop: mirror the homepage content from "Your Gym Re-imagined" and below */}
+          <div className="hidden md:block">
+            <DesktopAboutContent />
+          </div>
+
+          {/* Mobile-only About content (desktop untouched by this wrapper) */}
+          <div className="md:hidden">
           {/* Hero Section (desktop only) */}
           <ScrollReveal>
             <div className="mb-12 text-center hidden md:block">
@@ -491,6 +499,7 @@ const About = () => {
             </Card>
           </ScrollReveal>
 
+          </div>
         </div>
       </div>
     </>
