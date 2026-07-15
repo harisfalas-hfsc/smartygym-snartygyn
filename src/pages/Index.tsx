@@ -611,9 +611,9 @@ const Index = () => {
                 Science-Backed · Expert-Designed
               </p>
               <h1 className="text-4xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
-                Your Gym
+                RE
                 <br />
-                <span className="text-primary">Reimagined</span>
+                <span className="text-primary">imagined</span>
               </h1>
               <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
                 <span className="block">Expert Workouts · Training Programs</span>
@@ -948,7 +948,8 @@ const Index = () => {
               />
             </div>
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
-              Your Gym <span className="text-primary">Re-imagined</span>
+              <span className="block">RE</span>
+              <span className="block text-primary">imagined</span>
             </h1>
             <p className="text-sm md:text-base text-muted-foreground mt-2 leading-relaxed">
               Your gym, in your pocket. Expert-designed workouts, structured training programs, blog insights and smart tools — <span className="font-semibold text-foreground">100% Human</span>, <span className="font-semibold text-red-500">0% AI</span>. Designed by Sports Scientist{' '}
