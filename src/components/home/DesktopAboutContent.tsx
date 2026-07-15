@@ -31,9 +31,9 @@ import valueResultsDriven from "@/assets/value-results-driven.jpg";
  */
 export const DesktopAboutContent = ({ showPremiumCta = false }: { showPremiumCta?: boolean } = {}) => {
   const navigate = useNavigate();
-  const { userTier, user } = useAccessControl();
+  const { userTier } = useAccessControl();
   const isPremium = userTier === "premium";
-  const shouldShowPremiumCta = showPremiumCta && !!user && !isPremium;
+  const shouldShowPremiumCta = showPremiumCta && !isPremium;
   const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
 
   return (
