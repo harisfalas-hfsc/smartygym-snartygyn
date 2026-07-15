@@ -148,7 +148,7 @@ const About = () => {
                 <div className="text-center space-y-4">
                   <Target className="w-12 h-12 text-primary mx-auto" />
                   <h2 className="text-2xl font-bold text-foreground">
-                    Anywhere, Anytime.
+                    Your Gym Re-imagined. Anywhere, Anytime.
                   </h2>
                   {/* Mobile: vertical list */}
                   <div className="space-y-3 text-left md:hidden">
