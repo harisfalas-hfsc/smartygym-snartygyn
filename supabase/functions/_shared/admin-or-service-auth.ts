@@ -18,9 +18,14 @@ export async function requireAdminOrServiceRole(
 
   const authHeader = req.headers.get("Authorization") || "";
   const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-  if (!token) return unauthorized();
-
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+
+  // Accept internal cron shared-secret header for scheduler/DB-trigger callers
+  const cronSecret = Deno.env.get("CRON_INVOKE_SECRET") || "";
+  const providedCronSecret = (req.headers.get("x-cron-secret") || "").trim();
+  if (cronSecret && providedCronSecret && providedCronSecret === cronSecret) return null;
+
+  if (!token) return unauthorized();
   if (serviceRoleKey && token === serviceRoleKey) return null;
 
   try {
