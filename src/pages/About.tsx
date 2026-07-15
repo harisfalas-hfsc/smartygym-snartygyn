@@ -127,7 +127,7 @@ const About = () => {
 
           {/* Desktop: mirror the homepage content from "Your Gym Re-imagined" and below */}
           <div className="hidden md:block">
-            <DesktopAboutContent />
+            <DesktopAboutContent showPremiumCta />
           </div>
 
           {/* Mobile-only About content (desktop untouched by this wrapper) */}
