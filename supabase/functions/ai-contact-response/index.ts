@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireServiceRole } from "../_shared/cron-auth.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -97,6 +98,12 @@ Or: "I want to make sure I give you accurate details on this - I'll look into it
 - Blog: smartygym.com/blog`;
 
 serve(async (req) => {
+  const corsHeadersLocal = corsHeaders;
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeadersLocal });
+  }
+  const authFail = requireServiceRole(req, corsHeadersLocal);
+  if (authFail) return authFail;
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
