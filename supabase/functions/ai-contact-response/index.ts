@@ -98,16 +98,11 @@ Or: "I want to make sure I give you accurate details on this - I'll look into it
 - Blog: smartygym.com/blog`;
 
 serve(async (req) => {
-  const corsHeadersLocal = corsHeaders;
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeadersLocal });
-  }
-  const authFail = requireServiceRole(req, corsHeadersLocal);
-  if (authFail) return authFail;
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+  const authFail = requireServiceRole(req, corsHeaders);
+  if (authFail) return authFail;
 
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
