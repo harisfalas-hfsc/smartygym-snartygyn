@@ -29,10 +29,11 @@ import valueResultsDriven from "@/assets/value-results-driven.jpg";
  * starting at "Your Gym Re-imagined" and continuing through the CTA.
  * Rendering pages must gate this with `hidden md:block` themselves.
  */
-export const DesktopAboutContent = () => {
+export const DesktopAboutContent = ({ showPremiumCta = false }: { showPremiumCta?: boolean } = {}) => {
   const navigate = useNavigate();
-  const { userTier } = useAccessControl();
+  const { userTier, user } = useAccessControl();
   const isPremium = userTier === "premium";
+  const shouldShowPremiumCta = showPremiumCta && !!user && !isPremium;
   const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
 
   return (
@@ -387,6 +388,43 @@ export const DesktopAboutContent = () => {
             </Card>
           </div>
         </section>
+
+        {/* Premium CTA (About page desktop only, signed-in non-premium users) */}
+        {shouldShowPremiumCta && (
+          <section className="mb-20 hidden md:block">
+            <Card
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate('/smarty-premium')}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate('/smarty-premium'); }}
+              className="border-2 border-primary cursor-pointer hover:bg-primary/5 transition-colors"
+            >
+              <CardContent className="p-10">
+                <div className="flex items-center gap-8">
+                  <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Crown className="w-10 h-10 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs font-bold tracking-[0.3em] text-primary uppercase mb-2">Membership</p>
+                    <h3 className="text-3xl font-black tracking-tight uppercase mb-2">Get the Full Experience</h3>
+                    <p className="text-base text-muted-foreground max-w-2xl">
+                      Every workout, program, ritual and tool — designed 100% by humans. Cancel anytime.
+                    </p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-4xl font-extrabold text-primary leading-none">
+                      €9.99<span className="text-lg font-medium text-muted-foreground">/month</span>
+                    </p>
+                    <span className="inline-flex items-center gap-1.5 mt-3 text-sm font-semibold text-green-500">
+                      Unlock Smarty Premium
+                      <ChevronRight className="w-4 h-4" />
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* Message from Head Coach */}
         {/* Message from Head Coach */}
