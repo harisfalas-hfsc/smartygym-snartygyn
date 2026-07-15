@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@2.0.0";
 import { wrapInEmailTemplate, getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
 import { canSend, type AutomationKey } from "../_shared/notification-preferences.ts";
+import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,6 +34,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const authFail = await requireAdminOrServiceRole(req, corsHeaders);
+  if (authFail) return authFail;
 
   try {
     logStep("Function started");

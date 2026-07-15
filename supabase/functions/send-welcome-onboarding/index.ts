@@ -5,6 +5,7 @@ import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 import { getEmailHeaders, wrapInEmailTemplateWithFooter } from "../_shared/email-utils.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
 import { canSend } from "../_shared/notification-preferences.ts";
+import { requireServiceRole } from "../_shared/cron-auth.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -136,6 +137,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const authFail = requireServiceRole(req, corsHeaders);
+  if (authFail) return authFail;
 
   try {
     const supabaseAdmin = createClient(
