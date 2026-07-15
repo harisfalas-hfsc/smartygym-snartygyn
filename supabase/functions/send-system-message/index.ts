@@ -4,6 +4,7 @@ import { Resend } from "https://esm.sh/resend@3.5.0";
 import { getEmailHeaders, getEmailFooter, wrapInEmailTemplateWithFooter } from "../_shared/email-utils.ts";
 import { logEmailDelivery } from "../_shared/email-log.ts";
 import { canSend, type AutomationKey } from "../_shared/notification-preferences.ts";
+import { requireAdminOrServiceRole } from "../_shared/admin-or-service-auth.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -34,6 +35,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const authFail = await requireAdminOrServiceRole(req, corsHeaders);
+  if (authFail) return authFail;
 
   try {
     const { userId, messageType, customData = {} }: SendMessageRequest = await req.json();
