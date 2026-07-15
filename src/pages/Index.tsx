@@ -611,9 +611,9 @@ const Index = () => {
                 Science-Backed · Expert-Designed
               </p>
               <h1 className="text-4xl font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
-                Train <span className="text-primary">Smarter.</span>
+                Your Gym
                 <br />
-                Not Harder.
+                <span className="text-primary">Reimagined</span>
               </h1>
               <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
                 <span className="block">Expert Workouts · Training Programs</span>
