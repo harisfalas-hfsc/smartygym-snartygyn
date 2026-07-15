@@ -610,8 +610,9 @@ const Index = () => {
               <p className="text-[11px] font-bold tracking-[0.2em] uppercase text-primary mb-2">
                 Science-Backed · Expert-Designed
               </p>
-              <h1 className="text-[7vw] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground whitespace-nowrap">
-                Your Gym <span className="text-primary">Re-imagined</span>
+              <h1 className="text-[9vw] font-extrabold tracking-tight uppercase leading-[1.05] text-foreground">
+                <span className="block">Your Gym</span>
+                <span className="block text-primary">Re-imagined.</span>
               </h1>
               <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-muted-foreground mt-3 leading-snug">
                 <span className="block">Expert Workouts · Training Programs</span>
