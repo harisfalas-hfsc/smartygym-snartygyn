@@ -29,10 +29,11 @@ import valueResultsDriven from "@/assets/value-results-driven.jpg";
  * starting at "Your Gym Re-imagined" and continuing through the CTA.
  * Rendering pages must gate this with `hidden md:block` themselves.
  */
-export const DesktopAboutContent = () => {
+export const DesktopAboutContent = ({ showPremiumCta = false }: { showPremiumCta?: boolean } = {}) => {
   const navigate = useNavigate();
-  const { userTier } = useAccessControl();
+  const { userTier, user } = useAccessControl();
   const isPremium = userTier === "premium";
+  const shouldShowPremiumCta = showPremiumCta && !!user && !isPremium;
   const [activeAudienceTooltip, setActiveAudienceTooltip] = useState<string | null>(null);
 
   return (
