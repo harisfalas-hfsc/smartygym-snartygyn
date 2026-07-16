@@ -380,10 +380,12 @@ export function useCheckins() {
       const checkin = await createOrGetTodayCheckin();
       if (!checkin) return;
 
-      const updateField = type === 'morning' ? 'morning_modal_shown' : 'night_modal_shown';
+      const updatePayload = type === 'morning'
+        ? { morning_modal_shown: true }
+        : { night_modal_shown: true };
       await supabase
         .from('smarty_checkins')
-        .update({ [updateField]: true })
+        .update(updatePayload)
         .eq('id', checkin.id);
 
       await fetchTodayCheckin();

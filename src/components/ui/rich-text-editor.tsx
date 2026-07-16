@@ -115,7 +115,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
+      (StarterKit.configure({
         codeBlock: false,
         // Explicitly configure list extensions
         bulletList: {
@@ -145,7 +145,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             class: 'tiptap-paragraph',
           },
         },
-      }),
+      }) as any),
       Underline,
       TextStyle,
       Color,
