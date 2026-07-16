@@ -4,8 +4,7 @@ import { getBlogArticleImage } from "@/utils/blogImages";
 import toolTimerImage from "@/assets/tools/timer-card-mobile.jpg";
 import tool1RmImage from "@/assets/tools/1rm-card-mobile.jpg";
 import toolMacroImage from "@/assets/tools/macro-card-mobile.jpg";
-import heroVideoAsset from "@/assets/hero-smartygym-spliced.mp4.asset.json";
-const heroVideo = heroVideoAsset.url;
+const heroVideo = "/videos/hero-smartygym-spliced.mp4";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
 import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
@@ -137,6 +136,7 @@ export const DesktopWellnessHero = ({
           muted
           loop
           playsInline
+          preload="auto"
           poster={heroWorkoutsImage}
         />
         <div className="absolute inset-0 bg-black/55" />
