@@ -196,7 +196,7 @@ export const DesktopWellnessHero = ({
               className="border-t border-border/40 bg-background"
             >
               <div
-                className={`max-w-7xl mx-auto px-6 lg:px-8 py-8 lg:py-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-stretch ${
+                className={`max-w-7xl mx-auto px-6 lg:px-8 py-8 lg:py-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start ${
                   reverse ? "md:[&>*:first-child]:order-2" : ""
                 }`}
               >
@@ -214,7 +214,7 @@ export const DesktopWellnessHero = ({
                   />
                 </button>
 
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col">
                   <div
                     className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em]"
                     style={{ color: s.accent }}
@@ -264,7 +264,7 @@ export const DesktopWellnessHero = ({
                     </div>
                   )}
 
-                  <div className="mt-auto pt-5">
+                  <div className="mt-6">
                     <button
                       type="button"
                       onClick={() => navigate(s.route)}
