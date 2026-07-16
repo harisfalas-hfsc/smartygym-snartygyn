@@ -145,6 +145,22 @@ export const DesktopWellnessHero = ({
         <div className="relative z-10 h-full flex items-center px-6 lg:px-0">
           <div className="w-full max-w-7xl mx-auto">
             <div className="max-w-2xl text-left lg:ml-16 xl:ml-24 -translate-y-20">
+              <div className="mb-5 flex items-center gap-3">
+                <a href="https://www.facebook.com/profile.php?id=61579302997368" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="p-2 rounded-full border-2 border-white/80 text-white hover:bg-white hover:text-primary transition-colors">
+                  <Facebook className="h-4 w-4" />
+                </a>
+                <a href="https://www.instagram.com/thesmartygym/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="p-2 rounded-full border-2 border-white/80 text-white hover:bg-white hover:text-primary transition-colors">
+                  <Instagram className="h-4 w-4" />
+                </a>
+                <a href="https://www.tiktok.com/@thesmartygym?lang=en" target="_blank" rel="noopener noreferrer" aria-label="TikTok" className="p-2 rounded-full border-2 border-white/80 text-white hover:bg-white hover:text-primary transition-colors">
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                  </svg>
+                </a>
+                <a href="https://www.youtube.com/@TheSmartyGym" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="p-2 rounded-full border-2 border-white/80 text-white hover:bg-white hover:text-primary transition-colors">
+                  <Youtube className="h-4 w-4" />
+                </a>
+              </div>
               <h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-extrabold leading-[1.05] tracking-tight whitespace-nowrap">
                 Your Gym <span className="text-primary">Re-imagined.</span>
               </h1>
