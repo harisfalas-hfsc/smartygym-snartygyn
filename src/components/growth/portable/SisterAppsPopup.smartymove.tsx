@@ -70,35 +70,35 @@ export const SisterAppsPopup = () => {
     <>
       <div
         aria-hidden={!open}
-        className={`fixed top-1/2 -translate-y-1/2 left-0 z-[60] flex items-center transition-transform duration-700 ease-out ${open ? "translate-x-0" : "-translate-x-[calc(100%+8px)]"}`}
+        className={`fixed top-1/2 -translate-y-1/2 left-0 z-[60] flex items-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "translate-x-0" : "-translate-x-[calc(100%+10px)]"}`}
       >
-        <aside className="w-[280px] sm:w-[300px] max-h-[calc(100dvh-2rem)] overflow-hidden rounded-r-2xl border border-l-0 border-primary/30 bg-card/70 backdrop-blur-xl shadow-2xl ring-1 ring-white/5">
-          <div className="p-3.5">
-            <div className="mb-2.5">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[9px] font-bold uppercase tracking-wider mb-1.5">
-                <Sparkles className="w-2.5 h-2.5" /> Smarty Family
+        <aside className="w-[250px] sm:w-[270px] overflow-visible rounded-r-[2rem] border border-l-0 border-primary/25 bg-background/50 backdrop-blur-2xl shadow-[0_20px_70px_hsl(var(--primary)/0.22)] ring-1 ring-primary/10">
+          <div className="px-4 py-4">
+            <div className="mb-3">
+              <span className="inline-flex items-center gap-1.5 text-primary text-[11px] font-extrabold uppercase tracking-[0.18em] drop-shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 fill-primary/25" /> Smarty Family
               </span>
-              <h2 className="text-[13px] font-semibold text-foreground leading-tight">
+              <h2 className="mt-1 text-[15px] font-bold text-foreground leading-tight">
                 Complete your wellness journey
               </h2>
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3.5">
               {others.map((app) => (
                 <a
                   key={app.id}
                   href={app.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex flex-row items-center gap-2.5 rounded-xl border border-border/50 bg-background/60 backdrop-blur p-2 hover:border-primary/50 hover:bg-background/90 transition-all"
+                  className="group flex items-center gap-3 rounded-r-2xl py-1 pr-2 transition-transform duration-300 hover:translate-x-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                 >
-                  <div className={`w-11 h-11 shrink-0 rounded-lg overflow-hidden flex items-center justify-center ${app.darkImage ? "bg-[#0F172A] p-1" : "bg-white p-1.5"}`}>
-                    <img src={app.image} alt={app.name} loading="lazy" className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500" />
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl flex items-center justify-center drop-shadow-[0_10px_24px_hsl(var(--primary)/0.24)] transition-transform duration-500 group-hover:scale-110">
+                    <img src={app.image} alt={app.name} loading="lazy" className={`max-w-full max-h-full object-contain ${app.darkImage ? "rounded-2xl" : ""}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[12px] font-semibold text-foreground leading-tight">{app.name}</h3>
-                    <p className="text-[10px] text-muted-foreground leading-snug line-clamp-2 mt-0.5">{app.tagline}</p>
+                    <h3 className="text-sm font-extrabold text-foreground leading-tight group-hover:text-primary transition-colors">{app.name}</h3>
+                    <p className="text-[11px] font-medium text-foreground/75 leading-snug line-clamp-2 mt-0.5">{app.tagline}</p>
                   </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
+                  <ExternalLink className="w-3.5 h-3.5 text-primary/70 group-hover:text-primary shrink-0 transition-colors" />
                 </a>
               ))}
             </div>
@@ -108,16 +108,16 @@ export const SisterAppsPopup = () => {
           type="button"
           onClick={() => setOpen(false)}
           aria-label="Hide panel"
-          className="h-14 w-5 -ml-px rounded-r-lg bg-primary/80 backdrop-blur text-primary-foreground flex items-center justify-center shadow-lg hover:bg-primary transition-colors"
+          className="h-12 w-7 -ml-1 rounded-r-full border border-l-0 border-primary/30 bg-background/55 backdrop-blur-xl text-primary flex items-center justify-center shadow-[0_10px_35px_hsl(var(--primary)/0.28)] hover:bg-primary/15 transition-colors"
         >
-          <ChevronLeft className="w-3.5 h-3.5" />
+          <ChevronLeft className="w-4 h-4" />
         </button>
       </div>
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Show sister apps"
-        className={`fixed top-1/2 -translate-y-1/2 left-0 z-[59] w-1 h-20 rounded-r-full bg-primary/40 hover:bg-primary/80 hover:w-2 transition-all duration-300 ${open ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+        className={`fixed top-1/2 -translate-y-1/2 left-0 z-[59] w-2 h-24 rounded-r-full bg-primary/45 shadow-[0_0_28px_hsl(var(--primary)/0.65)] hover:w-3 hover:bg-primary/80 transition-all duration-300 ${open ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       />
     </>
   );
