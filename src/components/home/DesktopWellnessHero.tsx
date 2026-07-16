@@ -10,7 +10,6 @@ import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
 import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroToolsImage from "@/assets/hero-tools.jpg";
-import smartyGymIcon from "@/assets/smarty-gym-icon-noborder.png";
 
 /**
  * Desktop-only wellness-style landing:
@@ -144,14 +143,7 @@ export const DesktopWellnessHero = ({
 
         <div className="relative z-10 h-full flex items-center px-6 lg:px-0">
           <div className="w-full max-w-7xl mx-auto">
-            <div className="max-w-2xl text-left lg:ml-16 xl:ml-24">
-              <div className="flex items-center gap-3 mb-4">
-                <img
-                  src={smartyGymIcon}
-                  alt="SmartyGym"
-                  className="w-20 h-20 object-contain"
-                />
-              </div>
+            <div className="max-w-2xl text-left lg:ml-16 xl:ml-24 -translate-y-32">
               <h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-extrabold leading-[1.05] tracking-tight whitespace-nowrap">
                 Your Gym <span className="text-primary">Re-imagined.</span>
               </h1>
