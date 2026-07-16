@@ -937,7 +937,13 @@ const Index = () => {
         </section>
 
         {/* Desktop hero (SmartyMove-style) */}
-        <DesktopWellnessHero />
+        <DesktopWellnessHero
+          workouts={latestWorkouts}
+          programs={latestPrograms}
+          articles={latestArticles}
+          workoutCategoryToSlug={workoutCategoryToSlug}
+          programCategoryToSlug={programCategoryToSlug}
+        />
 
         {/* Legacy desktop hero — hidden in favor of the SmartyWellness-style layout above */}
         <section className="hidden container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-2 md:pt-3 pb-2">
