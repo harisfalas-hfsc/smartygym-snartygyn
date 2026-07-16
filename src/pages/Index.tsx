@@ -32,6 +32,7 @@ import type { WorkoutData } from "@/hooks/useWorkoutData";
 import { getDifficultyColorClasses } from "@/lib/wodCycle";
 import { DesktopHeroRows } from "@/components/home/DesktopHeroRows";
 import { DesktopFeaturedGrid } from "@/components/home/DesktopFeaturedGrid";
+import { DesktopWellnessHero } from "@/components/home/DesktopWellnessHero";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from "@/components/ui/carousel";
 
 import heroWodImage from "@/assets/hero-wod.jpg";
@@ -936,7 +937,10 @@ const Index = () => {
         </section>
 
         {/* Desktop hero (SmartyMove-style) */}
-        <section className="hidden md:block container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-2 md:pt-3 pb-2">
+        <DesktopWellnessHero />
+
+        {/* Legacy desktop hero — hidden in favor of the SmartyWellness-style layout above */}
+        <section className="hidden container mx-auto max-w-6xl md:max-w-[1500px] px-4 md:px-6 pt-2 md:pt-3 pb-2">
           <div className="text-center max-w-3xl mx-auto mb-4 md:mb-5">
             <div className="flex justify-center mb-2">
               <img
