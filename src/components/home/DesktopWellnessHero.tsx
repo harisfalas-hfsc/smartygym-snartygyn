@@ -284,11 +284,11 @@ export const DesktopWellnessHero = ({
                     <button
                       type="button"
                       onClick={() => navigate(s.route)}
-                      className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all hover:gap-3"
-                      style={{ backgroundColor: s.accent }}
+                      className="group inline-flex items-center gap-2 text-sm font-semibold transition-all hover:gap-3"
+                      style={{ color: s.accent }}
                     >
                       {s.cta}
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                     </button>
                   </div>
                 </div>
