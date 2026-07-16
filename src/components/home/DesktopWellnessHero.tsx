@@ -1,6 +1,6 @@
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-const heroVideo = "/__l5e/assets-v1/7be581a5-fc6d-4952-b7bf-7cf0c4c6abf3/hero-couple-home-workout.mp4";
+import heroVideo from "@/assets/hero-smarty-wellness.mp4";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
 import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
