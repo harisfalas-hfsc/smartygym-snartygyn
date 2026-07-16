@@ -10,7 +10,6 @@ import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
 import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
 import heroToolsImage from "@/assets/hero-tools.jpg";
-import smartyGymIcon from "@/assets/smarty-gym-icon-noborder.png";
 
 /**
  * Desktop-only wellness-style landing:
