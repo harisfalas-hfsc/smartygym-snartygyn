@@ -40,7 +40,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
 
   const clampY = useCallback((y: number) => {
     const min = getDefaultTop();
-    const max = window.innerHeight - 60;
+    const max = window.innerHeight - 96;
     return Math.max(min, Math.min(max, y));
   }, [getDefaultTop]);
 
@@ -105,7 +105,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
             }}
             aria-label="Smarty Coach"
           >
-            <img src={smartyCoachIcon} alt="Smarty Coach" className="h-16 w-16 object-contain" loading="lazy" width={64} height={64} />
+            <img src={smartyCoachIcon} alt="Smarty Coach" className="h-24 w-24 object-contain" loading="lazy" width={96} height={96} />
           </button>
         </TooltipTrigger>
         <TooltipContent side="left">

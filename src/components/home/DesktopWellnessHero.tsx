@@ -143,7 +143,7 @@ export const DesktopWellnessHero = ({
 
         <div className="relative z-10 h-full flex items-center px-6 lg:px-0">
           <div className="w-full max-w-7xl mx-auto">
-            <div className="max-w-2xl text-left lg:ml-16 xl:ml-24 -translate-y-32">
+            <div className="max-w-2xl text-left lg:ml-16 xl:ml-24 -translate-y-20">
               <h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-extrabold leading-[1.05] tracking-tight whitespace-nowrap">
                 Your Gym <span className="text-primary">Re-imagined.</span>
               </h1>
