@@ -1,6 +1,6 @@
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import heroVideo from "@/assets/hero-smarty-wellness.mp4";
+import heroVideo from "@/assets/hero-couple-home-workout.mp4";
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
 import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
@@ -69,7 +69,7 @@ export const DesktopWellnessHero = () => {
   return (
     <div className="hidden md:block">
       {/* HERO — fullscreen video */}
-      <section className="relative w-full h-[85vh] min-h-[560px] overflow-hidden">
+      <section className="relative w-full h-[70vh] min-h-[480px] overflow-hidden">
         <video
           className="absolute inset-0 w-full h-full object-cover"
           src={heroVideo}
@@ -147,7 +147,7 @@ export const DesktopWellnessHero = () => {
               className="border-t border-border/40 bg-background"
             >
               <div
-                className={`max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-24 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-center ${
+                className={`max-w-7xl mx-auto px-6 lg:px-8 py-8 lg:py-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center ${
                   reverse ? "md:[&>*:first-child]:order-2" : ""
                 }`}
               >
