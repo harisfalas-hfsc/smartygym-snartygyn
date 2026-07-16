@@ -1,6 +1,7 @@
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import heroVideo from "@/assets/hero-smarty-wellness.mp4";
+import heroVideoAsset from "@/assets/hero-smartygym-spliced.mp4.asset.json";
+const heroVideo = heroVideoAsset.url;
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
 import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
@@ -91,11 +92,12 @@ export const DesktopWellnessHero = () => {
                   className="w-20 h-20 object-contain"
                 />
               </div>
-              <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight">
-                Your Gym Re-imagined.
-                <br />
-                Anywhere, Anytime.
+              <h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-extrabold leading-[1.05] tracking-tight whitespace-nowrap">
+                Your Gym <span className="text-primary">Re-imagined.</span>
               </h1>
+              <p className="mt-2 text-white/80 text-lg md:text-xl font-semibold tracking-wide">
+                Anywhere, Anytime.
+              </p>
               <p className="mt-6 max-w-xl text-white/90 text-base md:text-lg leading-relaxed">
                 Expert-designed workouts, structured programs, blog insights and smart tools —{" "}
                 <span className="font-bold">100% Human</span>,{" "}
