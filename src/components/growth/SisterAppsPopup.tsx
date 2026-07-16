@@ -63,12 +63,12 @@ export const SisterAppsPopup = () => {
         aria-hidden={!open}
         className={`fixed top-1/2 -translate-y-1/2 left-0 z-[60] flex items-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "translate-x-0" : "-translate-x-[calc(100%+10px)]"}`}
       >
-        <aside className="w-[260px] pl-4 pr-2 py-4">
+        <aside className="w-[260px] pl-4 pr-2 py-4 bg-white/50 rounded-r-2xl">
           <div className="mb-4">
-            <span className="inline-flex items-center gap-1.5 text-primary text-[11px] font-extrabold uppercase tracking-[0.2em] [text-shadow:0_1px_8px_rgba(0,0,0,0.85)]">
+            <span className="inline-flex items-center gap-1.5 text-primary text-[11px] font-extrabold uppercase tracking-[0.2em]">
               <Sparkles className="w-3.5 h-3.5 text-primary" /> Smarty Family
             </span>
-            <h2 className="mt-1 text-[15px] font-bold text-white leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.9)]">
+            <h2 className="mt-1 text-[15px] font-bold text-slate-900 leading-tight">
               Complete your wellness journey
             </h2>
           </div>
@@ -82,7 +82,7 @@ export const SisterAppsPopup = () => {
                 rel="noopener noreferrer"
                 className="group flex items-center gap-3 py-1 transition-transform duration-300 hover:translate-x-1 focus-visible:outline-none"
               >
-                <div className="h-14 w-14 shrink-0 flex items-center justify-center drop-shadow-[0_6px_18px_rgba(0,0,0,0.7)] transition-transform duration-500 group-hover:scale-110">
+                <div className="h-14 w-14 shrink-0 flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
                   <img
                     src={app.image}
                     alt={app.name}
@@ -91,10 +91,10 @@ export const SisterAppsPopup = () => {
                   />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-extrabold text-white leading-tight group-hover:text-primary transition-colors [text-shadow:0_2px_10px_rgba(0,0,0,0.9)]">{app.name}</h3>
-                  <p className="text-[11px] font-medium text-white/90 leading-snug line-clamp-2 mt-0.5 [text-shadow:0_1px_8px_rgba(0,0,0,0.85)]">{app.tagline}</p>
+                  <h3 className="text-sm font-extrabold text-slate-900 leading-tight group-hover:text-primary transition-colors">{app.name}</h3>
+                  <p className="text-[11px] font-medium text-slate-700 leading-snug line-clamp-2 mt-0.5">{app.tagline}</p>
                 </div>
-                <ExternalLink className="w-3.5 h-3.5 text-primary shrink-0 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]" />
+                <ExternalLink className="w-3.5 h-3.5 text-primary shrink-0" />
               </a>
             ))}
           </div>
@@ -104,7 +104,7 @@ export const SisterAppsPopup = () => {
           type="button"
           onClick={() => setOpen(false)}
           aria-label="Hide panel"
-          className="h-12 w-6 rounded-r-full bg-transparent text-primary flex items-center justify-center drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] hover:text-primary/80 transition-colors"
+          className="h-12 w-6 rounded-r-full bg-white/50 text-slate-900 flex items-center justify-center hover:bg-white/70 transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
