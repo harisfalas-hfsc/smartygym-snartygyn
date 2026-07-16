@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ExternalLink, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
+import { ExternalLink, Sparkles, ChevronLeft } from "lucide-react";
 import logoMove from "@/assets/smartymove-logo.png";
 import logoDiet from "@/assets/smartydiet-logo.png";
 import logoGym from "@/assets/smarty-gym-logo.png";
