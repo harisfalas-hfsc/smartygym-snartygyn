@@ -230,36 +230,36 @@ export const DesktopWellnessHero = ({
                     Smarty{" "}
                     <span style={{ color: s.accent }}>{s.accentWord}</span>
                   </h2>
-                  <p className="mt-3 text-muted-foreground text-sm leading-snug line-clamp-4">
+                  <p className="mt-3 text-muted-foreground text-sm leading-snug line-clamp-3">
                     {s.description}
                   </p>
 
                   {s.featured.length > 0 && (
-                    <div className="mt-4 flex flex-col gap-1.5">
+                    <div className="mt-5 flex flex-col gap-2 lg:gap-2.5">
                       {s.featured.map((item) => (
                         <button
                           key={item.id}
                           type="button"
                           onClick={() => navigate(item.route)}
-                          className="group flex items-center gap-2 text-left transition-colors hover:text-primary"
+                          className="group flex min-h-12 lg:min-h-14 xl:min-h-16 items-center gap-3 text-left transition-colors hover:text-primary"
                         >
                           <img
                             src={item.image}
                             alt={item.title}
                             loading="lazy"
-                            className="w-9 h-9 rounded-md object-cover flex-shrink-0"
+                            className="w-12 h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 rounded-md object-cover flex-shrink-0"
                           />
                           <div className="min-w-0 flex-1">
-                            <div className="text-xs font-semibold text-foreground group-hover:text-primary truncate">
+                            <div className="text-sm xl:text-base font-semibold text-foreground group-hover:text-primary truncate">
                               {item.title}
                             </div>
                             {item.meta && (
-                              <div className="text-[11px] leading-tight text-muted-foreground truncate">
+                              <div className="mt-0.5 text-xs xl:text-sm leading-tight text-muted-foreground truncate">
                                 {item.meta}
                               </div>
                             )}
                           </div>
-                          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary flex-shrink-0" />
+                          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0" />
                         </button>
                       ))}
                     </div>
@@ -270,11 +270,11 @@ export const DesktopWellnessHero = ({
                     <button
                       type="button"
                       onClick={() => navigate(s.route)}
-                      className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-white transition-all hover:gap-3"
+                      className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all hover:gap-3"
                       style={{ backgroundColor: s.accent }}
                     >
                       {s.cta}
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
