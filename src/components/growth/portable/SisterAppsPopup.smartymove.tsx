@@ -72,7 +72,7 @@ export const SisterAppsPopup = () => {
         aria-hidden={!open}
         className={`fixed top-1/2 -translate-y-1/2 left-0 z-[60] flex items-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "translate-x-0" : "-translate-x-[calc(100%+10px)]"}`}
       >
-        <aside className="w-[260px] pl-4 pr-2 py-4 bg-white/50 rounded-r-2xl">
+        <aside className="w-[260px] pl-4 pr-2 py-4 bg-white rounded-r-2xl shadow-[4px_0_24px_rgba(15,23,42,0.12)]">
           <div className="mb-4">
             <span className="inline-flex items-center gap-1.5 text-primary text-[11px] font-extrabold uppercase tracking-[0.2em]">
               <Sparkles className="w-3.5 h-3.5 text-primary" /> Smarty Family
@@ -106,7 +106,7 @@ export const SisterAppsPopup = () => {
           type="button"
           onClick={() => setOpen(false)}
           aria-label="Hide panel"
-          className="h-12 w-6 rounded-r-full bg-white/50 text-slate-900 flex items-center justify-center hover:bg-white/70 transition-colors"
+          className="h-12 w-6 rounded-r-full bg-white text-slate-900 flex items-center justify-center hover:bg-slate-50 transition-colors shadow-[4px_0_12px_rgba(15,23,42,0.08)]"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -115,7 +115,7 @@ export const SisterAppsPopup = () => {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Show sister apps"
-        className={`fixed top-1/2 -translate-y-1/2 left-0 z-[59] w-2 h-24 rounded-r-full bg-primary/45 shadow-[0_0_28px_hsl(var(--primary)/0.65)] hover:w-3 hover:bg-primary/80 transition-all duration-300 ${open ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+        className={`fixed top-1/2 -translate-y-1/2 left-0 z-[59] w-2 h-24 rounded-r-full bg-primary shadow-[0_0_28px_hsl(var(--primary)/0.65)] hover:w-3 hover:bg-primary transition-all duration-300 ${open ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       />
     </>
   );
