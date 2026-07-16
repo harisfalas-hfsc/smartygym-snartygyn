@@ -1,5 +1,9 @@
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getBlogArticleImage } from "@/utils/blogImages";
+import toolTimerImage from "@/assets/tools/timer-card-mobile.jpg";
+import tool1RmImage from "@/assets/tools/1rm-card-mobile.jpg";
+import toolMacroImage from "@/assets/tools/macro-card-mobile.jpg";
 import heroVideoAsset from "@/assets/hero-smartygym-spliced.mp4.asset.json";
 const heroVideo = heroVideoAsset.url;
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
@@ -13,8 +17,60 @@ import smartyGymIcon from "@/assets/smarty-gym-icon-noborder.png";
  * fullscreen looping video hero followed by four alternating brand sections
  * (Workouts, Programs, Blog, Tools). Mirrors the SMARTY WELLNESS layout.
  */
-export const DesktopWellnessHero = () => {
+type Props = {
+  workouts?: any[];
+  programs?: any[];
+  articles?: any[];
+  workoutCategoryToSlug?: (cat?: string | null) => string;
+  programCategoryToSlug?: (cat?: string | null) => string;
+};
+
+type FeaturedItem = {
+  id: string;
+  title: string;
+  meta?: string;
+  image: string;
+  route: string;
+};
+
+export const DesktopWellnessHero = ({
+  workouts = [],
+  programs = [],
+  articles = [],
+  workoutCategoryToSlug = (c) => (c || "").toLowerCase().replace(/\s+/g, "-"),
+  programCategoryToSlug = (c) => (c || "").toLowerCase().replace(/\s+/g, "-"),
+}: Props = {}) => {
   const navigate = useNavigate();
+
+  const workoutItems: FeaturedItem[] = (workouts || []).slice(0, 3).map((w: any) => ({
+    id: w.id,
+    title: w.name,
+    meta: [w.duration, w.difficulty].filter(Boolean).join(" · ") || w.category,
+    image: w.image_url || "/images/workouts/wod-card-mobile.jpg",
+    route: `/workout/${workoutCategoryToSlug(w.category)}/${w.id}`,
+  }));
+
+  const programItems: FeaturedItem[] = (programs || []).slice(0, 3).map((p: any) => ({
+    id: p.id,
+    title: p.name,
+    meta: [p.weeks ? `${p.weeks} weeks` : null, p.difficulty].filter(Boolean).join(" · ") || p.category,
+    image: p.image_url || "/images/programs/functional-strength-card-mobile.jpg",
+    route: `/trainingprogram/${programCategoryToSlug(p.category)}/${p.id}`,
+  }));
+
+  const articleItems: FeaturedItem[] = (articles || []).slice(0, 3).map((a: any) => ({
+    id: a.id,
+    title: a.title,
+    meta: [a.read_time, a.category].filter(Boolean).join(" · "),
+    image: getBlogArticleImage(a.image_url, a.slug),
+    route: `/blog/${a.slug}.html`,
+  }));
+
+  const toolItems: FeaturedItem[] = [
+    { id: "timer", title: "Workout Timer", meta: "HIIT · Tabata · EMOM", image: toolTimerImage, route: "/tools/workout-timer" },
+    { id: "1rm", title: "1RM Calculator", meta: "Find your one-rep max", image: tool1RmImage, route: "/tools/1rm-calculator" },
+    { id: "macro", title: "Macro Calculator", meta: "Personalized nutrition", image: toolMacroImage, route: "/tools/macro-calculator" },
+  ];
 
   const sections = [
     {
@@ -24,10 +80,11 @@ export const DesktopWellnessHero = () => {
       name: "Smarty Workouts",
       accentWord: "Workouts",
       route: "/workout",
-      cta: "Explore Workouts",
+      cta: "Explore All Workouts",
       accent: "#4CAF50",
       description:
         "Expert-designed, single-session workouts for every goal — strength, conditioning, mobility, HIIT, recovery and more. 100% human-designed by Sports Scientist Haris Falas. Filter by equipment, difficulty and duration, and train anywhere with clear coaching cues and video demos for every exercise.",
+      featured: workoutItems,
     },
     {
       id: "programs",
@@ -36,10 +93,11 @@ export const DesktopWellnessHero = () => {
       name: "Smarty Programs",
       accentWord: "Programs",
       route: "/trainingprogram",
-      cta: "Explore Programs",
+      cta: "Explore All Programs",
       accent: "#29B6D2",
       description:
         "Structured multi-week training programs that take you from where you are to where you want to be. Strength, hypertrophy, fat loss, athletic performance, mobility and beginner-friendly plans — periodized week by week and built for real life, not the gym floor only.",
+      featured: programItems,
     },
     {
       id: "blog",
@@ -48,10 +106,11 @@ export const DesktopWellnessHero = () => {
       name: "Smarty Blog",
       accentWord: "Blog",
       route: "/blog",
-      cta: "Read the Blog",
+      cta: "Explore All Articles",
       accent: "#4CAF50",
       description:
         "Evidence-based articles on training, recovery, nutrition, longevity and mindset — written for people who want the real 'why' behind their programs. No hype, no trends, no shortcuts: just clear, science-based guidance from a working coach.",
+      featured: articleItems,
     },
     {
       id: "tools",
@@ -60,10 +119,11 @@ export const DesktopWellnessHero = () => {
       name: "Smarty Tools",
       accentWord: "Tools",
       route: "/tools",
-      cta: "Open the Tools",
+      cta: "Explore All Tools",
       accent: "#29B6D2",
       description:
         "A growing toolbox to plan, track and understand your training — 1RM calculator, macro & calorie calculators, BMR, workout timer (HIIT · Tabata · EMOM), rounds tracker and more. Fast, mobile-friendly, and free to use for everyone.",
+      featured: toolItems,
     },
   ];
 
@@ -123,13 +183,6 @@ export const DesktopWellnessHero = () => {
           </div>
         </div>
 
-        <a
-          href="#wellness-sections"
-          aria-label="Scroll to sections"
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors animate-bounce"
-        >
-          <ChevronDown className="w-8 h-8" />
-        </a>
       </section>
 
       {/* Brand sections */}
@@ -143,7 +196,7 @@ export const DesktopWellnessHero = () => {
               className="border-t border-border/40 bg-background"
             >
               <div
-                className={`max-w-7xl mx-auto px-6 lg:px-8 py-8 lg:py-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center ${
+                className={`max-w-7xl mx-auto px-6 lg:px-8 py-8 lg:py-10 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-stretch ${
                   reverse ? "md:[&>*:first-child]:order-2" : ""
                 }`}
               >
@@ -161,7 +214,7 @@ export const DesktopWellnessHero = () => {
                   />
                 </button>
 
-                <div>
+                <div className="flex flex-col h-full">
                   <div
                     className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em]"
                     style={{ color: s.accent }}
@@ -172,22 +225,56 @@ export const DesktopWellnessHero = () => {
                     />
                     {s.tag}
                   </div>
-                  <h2 className="mt-4 text-4xl lg:text-5xl font-extrabold tracking-tight text-foreground">
+                  <h2 className="mt-3 text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground">
                     Smarty{" "}
                     <span style={{ color: s.accent }}>{s.accentWord}</span>
                   </h2>
-                  <p className="mt-6 text-muted-foreground text-lg leading-relaxed">
+                  <p className="mt-4 text-muted-foreground text-base lg:text-[15px] leading-relaxed">
                     {s.description}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => navigate(s.route)}
-                    className="mt-8 inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white transition-all hover:gap-3"
-                    style={{ backgroundColor: s.accent }}
-                  >
-                    {s.cta}
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+
+                  {s.featured.length > 0 && (
+                    <div className="mt-5 flex flex-col gap-2">
+                      {s.featured.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => navigate(item.route)}
+                          className="group flex items-center gap-3 rounded-xl border border-border/60 bg-card/50 p-2 pr-3 text-left hover:border-primary/60 transition-colors"
+                        >
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            loading="lazy"
+                            className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="text-sm font-semibold text-foreground truncate">
+                              {item.title}
+                            </div>
+                            {item.meta && (
+                              <div className="text-xs text-muted-foreground truncate">
+                                {item.meta}
+                              </div>
+                            )}
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary flex-shrink-0" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="mt-auto pt-5">
+                    <button
+                      type="button"
+                      onClick={() => navigate(s.route)}
+                      className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white transition-all hover:gap-3"
+                      style={{ backgroundColor: s.accent }}
+                    >
+                      {s.cta}
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
