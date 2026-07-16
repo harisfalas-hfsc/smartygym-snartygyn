@@ -69,7 +69,7 @@ export const DesktopWellnessHero = () => {
   return (
     <div className="hidden md:block">
       {/* HERO — fullscreen video */}
-      <section className="relative w-full h-[70vh] min-h-[480px] overflow-hidden">
+      <section className="relative w-full h-screen overflow-hidden">
         <video
           className="absolute inset-0 w-full h-full object-cover"
           src={heroVideo}
@@ -88,22 +88,16 @@ export const DesktopWellnessHero = () => {
                 <img
                   src={smartyGymIcon}
                   alt="SmartyGym"
-                  className="w-14 h-14 object-contain"
+                  className="w-20 h-20 object-contain"
                 />
-                <span className="text-lg uppercase font-semibold tracking-wide text-white/90">
-                  SMARTY <span className="text-primary">GYM</span>
-                </span>
               </div>
               <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight">
-                Train Smarter.
+                Your Gym Re-imagined.
                 <br />
-                Move Better.
-                <br />
-                Age Stronger.
+                Anywhere, Anytime.
               </h1>
               <p className="mt-6 max-w-xl text-white/90 text-base md:text-lg leading-relaxed">
-                Your gym, re-imagined. Expert-designed workouts, structured programs,
-                blog insights and smart tools —{" "}
+                Expert-designed workouts, structured programs, blog insights and smart tools —{" "}
                 <span className="font-bold">100% Human</span>,{" "}
                 <span className="font-bold text-red-400">0% AI</span>.
               </p>
