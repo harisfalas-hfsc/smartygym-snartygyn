@@ -88,7 +88,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
             onPointerUp={handlePointerUp}
             className={cn(
               "fixed z-40 hidden md:block",
-              "rounded-full border-2 border-primary bg-background p-0 shadow-[0_2px_10px_-2px_hsl(var(--primary)/0.5)]",
+              "p-0 bg-transparent border-0 shadow-none",
               "cursor-grab active:cursor-grabbing",
               "hover:scale-110 transition-transform duration-200",
               "animate-in slide-in-from-right-5 duration-300",
@@ -105,7 +105,7 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
             }}
             aria-label="Smarty Coach"
           >
-            <img src={smartyCoachIcon} alt="Smarty Coach" className="h-14 w-14 rounded-full object-contain p-1" loading="lazy" width={55} height={55} />
+            <img src={smartyCoachIcon} alt="Smarty Coach" className="h-16 w-16 object-contain" loading="lazy" width={64} height={64} />
           </button>
         </TooltipTrigger>
         <TooltipContent side="left">
