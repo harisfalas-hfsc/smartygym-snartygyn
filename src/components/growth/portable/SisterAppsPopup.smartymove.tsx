@@ -72,45 +72,43 @@ export const SisterAppsPopup = () => {
         aria-hidden={!open}
         className={`fixed top-1/2 -translate-y-1/2 left-0 z-[60] flex items-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "translate-x-0" : "-translate-x-[calc(100%+10px)]"}`}
       >
-        <aside className="w-[250px] sm:w-[270px] overflow-visible rounded-r-[2rem] border border-l-0 border-primary/25 bg-background/50 backdrop-blur-2xl shadow-[0_20px_70px_hsl(var(--primary)/0.22)] ring-1 ring-primary/10">
-          <div className="px-4 py-4">
-            <div className="mb-3">
-              <span className="inline-flex items-center gap-1.5 text-primary text-[11px] font-extrabold uppercase tracking-[0.18em] drop-shadow-sm">
-                <Sparkles className="w-3.5 h-3.5 fill-primary/25" /> Smarty Family
-              </span>
-              <h2 className="mt-1 text-[15px] font-bold text-foreground leading-tight">
-                Complete your wellness journey
-              </h2>
-            </div>
-            <div className="flex flex-col gap-3.5">
-              {others.map((app) => (
-                <a
-                  key={app.id}
-                  href={app.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 rounded-r-2xl py-1 pr-2 transition-transform duration-300 hover:translate-x-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-                >
-                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl flex items-center justify-center drop-shadow-[0_10px_24px_hsl(var(--primary)/0.24)] transition-transform duration-500 group-hover:scale-110">
-                    <img src={app.image} alt={app.name} loading="lazy" className={`max-w-full max-h-full object-contain ${app.darkImage ? "rounded-2xl" : ""}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-extrabold text-foreground leading-tight group-hover:text-primary transition-colors">{app.name}</h3>
-                    <p className="text-[11px] font-medium text-foreground/75 leading-snug line-clamp-2 mt-0.5">{app.tagline}</p>
-                  </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-primary/70 group-hover:text-primary shrink-0 transition-colors" />
-                </a>
-              ))}
-            </div>
+        <aside className="w-[260px] pl-4 pr-2 py-4">
+          <div className="mb-4">
+            <span className="inline-flex items-center gap-1.5 text-primary text-[11px] font-extrabold uppercase tracking-[0.2em] [text-shadow:0_1px_8px_rgba(0,0,0,0.85)]">
+              <Sparkles className="w-3.5 h-3.5 text-primary" /> Smarty Family
+            </span>
+            <h2 className="mt-1 text-[15px] font-bold text-white leading-tight [text-shadow:0_2px_10px_rgba(0,0,0,0.9)]">
+              Complete your wellness journey
+            </h2>
+          </div>
+          <div className="flex flex-col gap-4">
+            {others.map((app) => (
+              <a
+                key={app.id}
+                href={app.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-3 py-1 transition-transform duration-300 hover:translate-x-1 focus-visible:outline-none"
+              >
+                <div className="h-14 w-14 shrink-0 flex items-center justify-center drop-shadow-[0_6px_18px_rgba(0,0,0,0.7)] transition-transform duration-500 group-hover:scale-110">
+                  <img src={app.image} alt={app.name} loading="lazy" className={`max-w-full max-h-full object-contain ${app.darkImage ? "rounded-2xl" : ""}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-extrabold text-white leading-tight group-hover:text-primary transition-colors [text-shadow:0_2px_10px_rgba(0,0,0,0.9)]">{app.name}</h3>
+                  <p className="text-[11px] font-medium text-white/90 leading-snug line-clamp-2 mt-0.5 [text-shadow:0_1px_8px_rgba(0,0,0,0.85)]">{app.tagline}</p>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-primary shrink-0 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]" />
+              </a>
+            ))}
           </div>
         </aside>
         <button
           type="button"
           onClick={() => setOpen(false)}
           aria-label="Hide panel"
-          className="h-12 w-7 -ml-1 rounded-r-full border border-l-0 border-primary/30 bg-background/55 backdrop-blur-xl text-primary flex items-center justify-center shadow-[0_10px_35px_hsl(var(--primary)/0.28)] hover:bg-primary/15 transition-colors"
+          className="h-12 w-6 rounded-r-full bg-transparent text-primary flex items-center justify-center drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] hover:text-primary/80 transition-colors"
         >
-          <ChevronLeft className="w-4 h-4" />
+          <ChevronLeft className="w-5 h-5" />
         </button>
       </div>
       <button
