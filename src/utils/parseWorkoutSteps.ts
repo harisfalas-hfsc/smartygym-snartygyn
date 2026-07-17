@@ -10,7 +10,7 @@ export interface WorkoutStep {
   section?: string; // e.g. "Warm-up", "Main Workout"
 }
 
-const EXERCISE_RE = /\{\{exercise:([^:}]+):([^}]+)\}\}/gi;
+const EXERCISE_RE = /\{\{exercise:([^:}]+):([^}]*)\}\}/gi;
 
 function stripHtml(html: string): string {
   const div = document.createElement("div");
