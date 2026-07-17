@@ -305,17 +305,15 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
               >
                 <X className="h-4 w-4" />
               </button>
-              <div className="grid grid-cols-[2.5rem_minmax(0,1fr)_2rem] items-center gap-2.5">
-                <div className="relative">
-                  <img
-                    src={smartyCoachIcon}
-                    alt="Smarty Coach"
-                    width={40}
-                    height={40}
-                    decoding="async"
-                    className="h-10 w-10 rounded-full object-contain"
-                  />
-                </div>
+              <div className="flex flex-col items-center text-center gap-2">
+                <img
+                  src={smartyCoachIcon}
+                  alt="Smarty Coach"
+                  width={40}
+                  height={40}
+                  decoding="async"
+                  className="h-10 w-10 rounded-full object-contain"
+                />
                 <div className="min-w-0">
                   <h2 className="text-base sm:text-lg md:text-2xl font-bold text-foreground leading-tight break-words">
                     Hi <span className="inline-block">👋</span> I'm your Smarty Coach
@@ -324,7 +322,6 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
                     How can I help you today?
                   </p>
                 </div>
-                <div aria-hidden="true" />
               </div>
             </div>
 
