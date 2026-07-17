@@ -113,7 +113,7 @@ function parseWorkoutSectionSteps(sectionLabel: string, html?: string | null): W
   if (!html?.trim()) return [];
   return parseWorkoutSteps(normalizeWorkoutHtml(html)).map((step) => ({
     ...step,
-    section: step.section || sectionLabel,
+    section: sectionLabel,
   }));
 }
 
@@ -204,6 +204,8 @@ export const WorkoutDisplay = ({
     ...parseWorkoutSectionSteps("Finisher", finisher),
     ...parseWorkoutSectionSteps("Cool-down", cool_down),
   ];
+  const trainingScheduleSteps = trainingScheduleHtml ? parseWorkoutSteps(trainingScheduleHtml) : [];
+  const personalProgramSteps = personalProgramHtml ? parseWorkoutSteps(personalProgramHtml) : [];
 
   const getDifficultyText = (diff: number) => {
     if (diff <= 2) return 'Beginner';
@@ -390,16 +392,29 @@ export const WorkoutDisplay = ({
                 <CardTitle className="flex items-center gap-2 text-2xl font-bold">
                   📆 Training Program
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 shrink-0 max-lg:h-9 max-lg:w-9 max-lg:p-0"
-                  onClick={() => openReader("Training Program", trainingScheduleHtml)}
-                  aria-label="Reader Mode"
-                >
-                  <BookOpen className="h-4 w-4" />
-                  <span className="hidden lg:inline">Reader Mode</span>
-                </Button>
+                <div className="flex items-center gap-2 shrink-0">
+                  {trainingScheduleSteps.length > 0 && (
+                    <Button
+                      size="sm"
+                      className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
+                      onClick={() => openPlayer("Training Program", trainingScheduleHtml, trainingScheduleSteps)}
+                      aria-label="Player Mode"
+                    >
+                      <Play className="h-4 w-4" />
+                      <span className="hidden lg:inline">Player</span>
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
+                    onClick={() => openReader("Training Program", trainingScheduleHtml)}
+                    aria-label="Reader Mode"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span className="hidden lg:inline">Reader</span>
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="content-container pt-6">
@@ -420,16 +435,29 @@ export const WorkoutDisplay = ({
                 <CardTitle className="flex items-center gap-2 text-2xl font-bold">
                   📆 Training Program
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 shrink-0 max-lg:h-9 max-lg:w-9 max-lg:p-0"
-                  onClick={() => openReader("Training Program", personalProgramHtml)}
-                  aria-label="Reader Mode"
-                >
-                  <BookOpen className="h-4 w-4" />
-                  <span className="hidden lg:inline">Reader Mode</span>
-                </Button>
+                <div className="flex items-center gap-2 shrink-0">
+                  {personalProgramSteps.length > 0 && (
+                    <Button
+                      size="sm"
+                      className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
+                      onClick={() => openPlayer("Training Program", personalProgramHtml, personalProgramSteps)}
+                      aria-label="Player Mode"
+                    >
+                      <Play className="h-4 w-4" />
+                      <span className="hidden lg:inline">Player</span>
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
+                    onClick={() => openReader("Training Program", personalProgramHtml)}
+                    aria-label="Reader Mode"
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span className="hidden lg:inline">Reader</span>
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="content-container pt-6">
