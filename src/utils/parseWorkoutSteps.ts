@@ -118,24 +118,35 @@ export function parseWorkoutSteps(html: string): WorkoutStep[] {
           const m = matches[0];
           const id = m[1]?.trim() || null;
           const name = m[2]?.trim() || "Exercise";
-          steps.push({
-            exerciseId: id && id !== "null" ? id : null,
-            name,
-            prescription: extractPrescription(rawText, name),
-            section: currentSection,
-            subSection: currentSubSection,
-          });
+          const finalId = id && id !== "null" ? id : null;
+          // Skip steps not linked to the exercise library — no GIF, no value in the Player.
+          if (finalId) {
+            steps.push({
+              exerciseId: finalId,
+              name,
+              prescription: extractPrescription(rawText, name),
+              section: currentSection,
+              subSection: currentSubSection,
+            });
+          } else if (typeof console !== "undefined") {
+            console.warn("[WorkoutPlayer] Skipping unlinked exercise:", name || rawText);
+          }
         } else {
           for (const m of matches) {
             const id = m[1]?.trim() || null;
             const name = m[2]?.trim() || "Exercise";
-            steps.push({
-              exerciseId: id && id !== "null" ? id : null,
-              name,
-              prescription: "",
-              section: currentSection,
-              subSection: currentSubSection,
-            });
+            const finalId = id && id !== "null" ? id : null;
+            if (finalId) {
+              steps.push({
+                exerciseId: finalId,
+                name,
+                prescription: "",
+                section: currentSection,
+                subSection: currentSubSection,
+              });
+            } else if (typeof console !== "undefined") {
+              console.warn("[WorkoutPlayer] Skipping unlinked exercise:", name);
+            }
           }
         }
       }
