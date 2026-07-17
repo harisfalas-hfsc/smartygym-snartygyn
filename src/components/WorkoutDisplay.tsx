@@ -601,6 +601,13 @@ export const WorkoutDisplay = ({
           />
         }
       />
+
+      <WorkoutPlayerDialog
+        open={player.open}
+        onOpenChange={(o) => setPlayer((p) => ({ ...p, open: o }))}
+        title={player.title}
+        steps={player.steps}
+      />
     </div>
   );
 };
