@@ -113,7 +113,7 @@ function parseWorkoutSectionSteps(sectionLabel: string, html?: string | null): W
   if (!html?.trim()) return [];
   return parseWorkoutSteps(normalizeWorkoutHtml(html)).map((step) => ({
     ...step,
-    section: sectionLabel,
+    section: step.section || sectionLabel,
   }));
 }
 

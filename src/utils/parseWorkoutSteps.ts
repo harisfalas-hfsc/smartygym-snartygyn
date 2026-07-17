@@ -8,6 +8,7 @@ export interface WorkoutStep {
   name: string;
   prescription: string; // e.g. "10 reps", "30 sec", "3 sets x 12"
   section?: string; // e.g. "Warm-up", "Main Workout"
+  subSection?: string; // e.g. "Tabata Block 1"
 }
 
 const EXERCISE_RE = /\{\{exercise:([^:}]+):([^}]*)\}\}/gi;
@@ -33,6 +34,34 @@ function extractPrescription(text: string, exerciseName: string): string {
     .trim();
 }
 
+function getCanonicalWorkoutSection(text: string): string | undefined {
+  const cleaned = text
+    .toLowerCase()
+    .replace(/[()\[\]{}:]/g, " ")
+    .replace(/\d+\s*(?:'|minutes?|mins?|m)\b/g, " ")
+    .replace(/^[^a-z0-9]+|[^a-z0-9]+$/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (/soft\s*tissue|tissue\s*preparation|prep\b/.test(cleaned)) return "Soft Tissue Preparation";
+  if (/activation/.test(cleaned)) return "Activation";
+  if (/warm\s*-?\s*up|warmup/.test(cleaned)) return "Warm-up";
+  if (/main\s*workout|main\s*block/.test(cleaned)) return "Main Workout";
+  if (/finisher/.test(cleaned)) return "Finisher";
+  if (/cool\s*-?\s*down|cooldown/.test(cleaned) || cleaned === "cool") return "Cool-down";
+
+  return undefined;
+}
+
+function getWorkoutSubSection(text: string): string | undefined {
+  const cleaned = text.replace(/\s+/g, " ").trim();
+  if (!cleaned || cleaned.length > 90) return undefined;
+  if (/\b(?:tabata|amrap|emom|circuit|block\s*\d+|round\s*\d+)\b/i.test(cleaned)) {
+    return cleaned.replace(/^[^a-zA-Z0-9]+/, "").trim();
+  }
+  return undefined;
+}
+
 export function parseWorkoutSteps(html: string): WorkoutStep[] {
   if (!html || typeof document === "undefined") return [];
 
@@ -42,6 +71,7 @@ export function parseWorkoutSteps(html: string): WorkoutStep[] {
 
   const steps: WorkoutStep[] = [];
   let currentSection: string | undefined;
+  let currentSubSection: string | undefined;
 
   // Walk in document order
   const walker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null);
@@ -53,18 +83,36 @@ export function parseWorkoutSteps(html: string): WorkoutStep[] {
     const tag = el.tagName?.toLowerCase();
 
     if (tag && ["h1", "h2", "h3", "h4"].includes(tag)) {
-      currentSection = stripHtml(el.innerHTML) || currentSection;
+      const heading = stripHtml(el.innerHTML);
+      const canonicalSection = getCanonicalWorkoutSection(heading);
+      if (canonicalSection) {
+        currentSection = canonicalSection;
+        currentSubSection = undefined;
+      } else {
+        currentSubSection = getWorkoutSubSection(heading) || currentSubSection;
+      }
     }
 
     if (tag && ["li", "p"].includes(tag) && !visited.has(el)) {
       const inner = el.innerHTML;
       const matches = Array.from(inner.matchAll(EXERCISE_RE));
+      const rawText = stripHtml(inner);
+
+      if (matches.length === 0) {
+        const canonicalSection = getCanonicalWorkoutSection(rawText);
+        if (canonicalSection) {
+          currentSection = canonicalSection;
+          currentSubSection = undefined;
+        } else {
+          currentSubSection = getWorkoutSubSection(rawText) || currentSubSection;
+        }
+      }
+
       if (matches.length > 0) {
         // mark ancestors visited to avoid duplicate p-inside-li
         visited.add(el);
         el.querySelectorAll("p, li").forEach(child => visited.add(child));
 
-        const rawText = stripHtml(inner);
         // If multiple exercises in one line, split by the placeholders
         if (matches.length === 1) {
           const m = matches[0];
@@ -75,6 +123,7 @@ export function parseWorkoutSteps(html: string): WorkoutStep[] {
             name,
             prescription: extractPrescription(rawText, name),
             section: currentSection,
+            subSection: currentSubSection,
           });
         } else {
           for (const m of matches) {
@@ -85,6 +134,7 @@ export function parseWorkoutSteps(html: string): WorkoutStep[] {
               name,
               prescription: "",
               section: currentSection,
+              subSection: currentSubSection,
             });
           }
         }
