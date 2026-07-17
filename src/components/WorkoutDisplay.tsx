@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Info, BookOpen } from "lucide-react";
+import { Star, Info, BookOpen, Play } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { WorkoutToolsCards } from "@/components/WorkoutToolsCards";
@@ -18,6 +18,8 @@ import { A4Container } from "@/components/ui/a4-container";
 import { ExerciseLibraryBanner } from "@/components/ExerciseLibraryBanner";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { normalizeWorkoutHtml } from "@/utils/htmlNormalizer";
+import { WorkoutPlayerDialog } from "@/components/WorkoutPlayerDialog";
+import { parseWorkoutSteps, type WorkoutStep } from "@/utils/parseWorkoutSteps";
 
 interface Exercise {
   name: string;
@@ -152,6 +154,11 @@ export const WorkoutDisplay = ({
     title: "",
     content: "",
   });
+  const [player, setPlayer] = useState<{ open: boolean; title: string; steps: WorkoutStep[] }>({
+    open: false,
+    title: "",
+    steps: [],
+  });
 
   const workoutContentHtml = joinWorkoutSections([activation, warm_up, main_workout, finisher, cool_down]);
   const trainingScheduleHtml = weekly_schedule ? normalizeWorkoutHtml(weekly_schedule) : '';
@@ -171,6 +178,18 @@ export const WorkoutDisplay = ({
       },
     });
   };
+
+  const openPlayer = (sectionTitle: string, html: string) => {
+    const steps = parseWorkoutSteps(html);
+    if (!steps.length) return;
+    setPlayer({
+      open: true,
+      title: title ? `${title} — ${sectionTitle}` : sectionTitle,
+      steps,
+    });
+  };
+
+  const workoutSteps = workoutContentHtml ? parseWorkoutSteps(workoutContentHtml) : [];
 
   const getDifficultyText = (diff: number) => {
     if (diff <= 2) return 'Beginner';
@@ -310,15 +329,27 @@ export const WorkoutDisplay = ({
                 <CardTitle className="flex items-center gap-2 text-2xl font-bold">
                   💪 Workout
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 shrink-0"
-                  onClick={() => openReader("Workout", workoutContentHtml)}
-                >
-                  <BookOpen className="h-4 w-4" />
-                  <span className="hidden sm:inline">Reader Mode</span>
-                </Button>
+                <div className="flex items-center gap-2 shrink-0">
+                  {workoutSteps.length > 0 && (
+                    <Button
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => openPlayer("Workout", workoutContentHtml)}
+                    >
+                      <Play className="h-4 w-4" />
+                      <span className="hidden sm:inline">Player Mode</span>
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => openReader("Workout", workoutContentHtml)}
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span className="hidden sm:inline">Reader Mode</span>
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="content-container pt-6">
@@ -569,6 +600,13 @@ export const WorkoutDisplay = ({
             enableExerciseLinking={true}
           />
         }
+      />
+
+      <WorkoutPlayerDialog
+        open={player.open}
+        onOpenChange={(o) => setPlayer((p) => ({ ...p, open: o }))}
+        title={player.title}
+        steps={player.steps}
       />
     </div>
   );
