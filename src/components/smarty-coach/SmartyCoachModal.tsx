@@ -25,6 +25,7 @@ import { getWorkoutUrl } from "@/utils/smarty-coach/routes";
 import { DialogDescription } from "@/components/ui/dialog";
 import smartyCoachIcon from "@/assets/smarty-gym-icon-noborder.png";
 import { fetchVisibleWorkoutMetadata } from "@/hooks/useTodayWods";
+import { useHighPriorityOverlay } from "@/lib/overlayActivity";
 
 type MenuAccent = 'primary' | 'amber' | 'emerald' | 'violet' | 'rose' | 'sky';
 const menuAccentClasses: Record<MenuAccent, string> = {
@@ -125,6 +126,8 @@ type MainPath = 'menu' | 'workout' | 'program' | 'knowledge';
 type WorkoutStep = 1 | 2 | 3 | 4 | 5 | 'result';
 
 export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: SmartyCoachModalProps) => {
+  useHighPriorityOverlay("smarty-coach", isOpen);
+
   const navigate = useNavigate();
   const { user } = useAccessControl();
   const context = useSmartyContext();
@@ -283,7 +286,7 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleDismiss()}>
       <DialogContent
         className={cn(
-          "p-0 border-0 overflow-hidden",
+          "!z-[70] p-0 border-0 overflow-hidden",
           // Use small/dynamic viewport units for consistent mobile-browser chrome behavior.
           "w-[calc(100svw-2rem)] max-w-[22rem] sm:max-w-md md:max-w-3xl lg:max-w-4xl mx-auto",
           "max-h-[calc(100svh-2rem)] supports-[height:100dvh]:max-h-[calc(100dvh-2rem)] sm:max-h-[85vh] overflow-y-auto overscroll-contain",

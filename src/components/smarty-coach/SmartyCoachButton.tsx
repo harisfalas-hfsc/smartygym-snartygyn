@@ -38,18 +38,6 @@ export const SmartyCoachButton = ({ className }: SmartyCoachButtonProps) => {
     setIsMounted(true);
   }, []);
 
-  // Auto-open Smarty Coach on the first load of a fresh browser session.
-  // Uses sessionStorage so it fires once per session (cleared when browser/app closes).
-  useEffect(() => {
-    try {
-      if (!sessionStorage.getItem("smarty-coach-autoopened")) {
-        sessionStorage.setItem("smarty-coach-autoopened", "1");
-        const t = setTimeout(() => setIsOpen(true), 600);
-        return () => clearTimeout(t);
-      }
-    } catch {}
-  }, []);
-
   const clampY = useCallback((y: number) => {
     const min = getDefaultTop();
     const max = window.innerHeight - 96;
