@@ -137,9 +137,6 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
     [currentStep]
   );
   const tabata = isTabataSection(currentStep?.section);
-  const activeDuration = tabata
-    ? phase === "work" ? 20 : 10
-    : workSeconds;
   const isTimed = tabata || workSeconds != null;
 
   const goToSlide = (targetIndex: number, jump = false) => {
