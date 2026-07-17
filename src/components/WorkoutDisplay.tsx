@@ -329,15 +329,27 @@ export const WorkoutDisplay = ({
                 <CardTitle className="flex items-center gap-2 text-2xl font-bold">
                   💪 Workout
                 </CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 shrink-0"
-                  onClick={() => openReader("Workout", workoutContentHtml)}
-                >
-                  <BookOpen className="h-4 w-4" />
-                  <span className="hidden sm:inline">Reader Mode</span>
-                </Button>
+                <div className="flex items-center gap-2 shrink-0">
+                  {workoutSteps.length > 0 && (
+                    <Button
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => openPlayer("Workout", workoutContentHtml)}
+                    >
+                      <Play className="h-4 w-4" />
+                      <span className="hidden sm:inline">Player Mode</span>
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => openReader("Workout", workoutContentHtml)}
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    <span className="hidden sm:inline">Reader Mode</span>
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="content-container pt-6">
