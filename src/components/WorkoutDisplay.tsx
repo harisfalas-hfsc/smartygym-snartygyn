@@ -337,7 +337,7 @@ export const WorkoutDisplay = ({
                       onClick={() => openPlayer("Workout", workoutContentHtml)}
                     >
                       <Play className="h-4 w-4" />
-                      <span className="hidden sm:inline">Player Mode</span>
+                      <span>Player</span>
                     </Button>
                   )}
                   <Button
@@ -347,7 +347,7 @@ export const WorkoutDisplay = ({
                     onClick={() => openReader("Workout", workoutContentHtml)}
                   >
                     <BookOpen className="h-4 w-4" />
-                    <span className="hidden sm:inline">Reader Mode</span>
+                    <span>Reader</span>
                   </Button>
                 </div>
               </div>
