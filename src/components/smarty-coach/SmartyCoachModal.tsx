@@ -309,10 +309,10 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
                 <img
                   src={smartyCoachIcon}
                   alt="Smarty Coach"
-                  width={40}
-                  height={40}
+                  width={70}
+                  height={70}
                   decoding="async"
-                  className="h-10 w-10 rounded-full object-contain"
+                  className="h-[70px] w-[70px] rounded-full object-contain"
                 />
                 <div className="min-w-0">
                   <h2 className="text-base sm:text-lg md:text-2xl font-bold text-foreground leading-tight break-words">
@@ -387,10 +387,10 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
               src={smartyCoachIcon}
               alt=""
               aria-hidden="true"
-              width={28}
-              height={28}
+              width={49}
+              height={49}
               decoding="async"
-              className="h-7 w-7 rounded-full object-contain"
+              className="h-12 w-12 rounded-full object-contain"
             />
             Smarty Coach
           </DialogTitle>
