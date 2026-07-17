@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Star, Info, BookOpen } from "lucide-react";
+import { Star, Info, BookOpen, Play } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNavigate } from "react-router-dom";
 import { WorkoutToolsCards } from "@/components/WorkoutToolsCards";
@@ -18,6 +18,8 @@ import { A4Container } from "@/components/ui/a4-container";
 import { ExerciseLibraryBanner } from "@/components/ExerciseLibraryBanner";
 import { ReaderModeDialog } from "@/components/ReaderModeDialog";
 import { normalizeWorkoutHtml } from "@/utils/htmlNormalizer";
+import { WorkoutPlayerDialog } from "@/components/WorkoutPlayerDialog";
+import { parseWorkoutSteps, type WorkoutStep } from "@/utils/parseWorkoutSteps";
 
 interface Exercise {
   name: string;
