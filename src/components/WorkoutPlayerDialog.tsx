@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { X, ChevronLeft, ChevronRight, Play, Pause, RotateCcw, SkipForward } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Play, Pause, RotateCcw, SkipForward, SkipBack } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,11 +41,65 @@ function useExerciseMedia(ids: string[]) {
   });
 }
 
+type PlayerSlide =
+  | {
+      type: "exercise";
+      step: WorkoutStep;
+      stepIndex: number;
+      isLastInSection: boolean;
+    }
+  | {
+      type: "section-break";
+      completedSection: string;
+      nextSection: string;
+      afterStepIndex: number;
+    };
+
+function normalizeSection(section?: string) {
+  return (section || "Workout").replace(/\s+/g, " ").trim() || "Workout";
+}
+
+function buildPlayerSlides(steps: WorkoutStep[]): PlayerSlide[] {
+  const slides: PlayerSlide[] = [];
+
+  steps.forEach((step, stepIndex) => {
+    const currentSection = normalizeSection(step.section);
+    const previousSection = stepIndex > 0 ? normalizeSection(steps[stepIndex - 1]?.section) : currentSection;
+
+    if (stepIndex > 0 && currentSection !== previousSection) {
+      slides.push({
+        type: "section-break",
+        completedSection: previousSection,
+        nextSection: currentSection,
+        afterStepIndex: stepIndex - 1,
+      });
+    }
+
+    const nextSection = stepIndex < steps.length - 1 ? normalizeSection(steps[stepIndex + 1]?.section) : currentSection;
+    slides.push({
+      type: "exercise",
+      step,
+      stepIndex,
+      isLastInSection: stepIndex === steps.length - 1 || nextSection !== currentSection,
+    });
+  });
+
+  return slides;
+}
+
+function hasRepOrSetPrescription(prescription: string): boolean {
+  return /\b(?:reps?|repetitions?|sets?)\b/i.test(prescription);
+}
+
 // Parse a prescription string to detect a work-time in seconds.
 // Matches "30 seconds", "30 sec", "30s", "0:45", "1:30".
 function parseWorkSeconds(prescription: string): number | null {
   if (!prescription) return null;
-  const p = prescription.toLowerCase();
+  if (hasRepOrSetPrescription(prescription)) return null;
+  const p = prescription
+    .toLowerCase()
+    .replace(/(?:^|[;,–—-])\s*rest\s*\d+\s*(?:seconds?|secs?|s|minutes?|mins?|m)?\b/g, " ")
+    .replace(/\brest\s*\d+\s*(?:seconds?|secs?|s|minutes?|mins?|m)?\b/g, " ");
   // mm:ss
   const mmss = p.match(/(\d+)\s*:\s*(\d{1,2})/);
   if (mmss) return parseInt(mmss[1], 10) * 60 + parseInt(mmss[2], 10);
@@ -62,6 +116,7 @@ function isTabataSection(section?: string): boolean {
 }
 
 export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: WorkoutPlayerDialogProps) {
+  const slides = useMemo(() => buildPlayerSlides(steps), [steps]);
   const ids = useMemo(
     () => Array.from(new Set(steps.map(s => s.exerciseId).filter(Boolean) as string[])),
     [steps]
@@ -75,7 +130,8 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
   const [running, setRunning] = useState(false);
   const tickRef = useRef<number | null>(null);
 
-  const currentStep = steps[index];
+  const currentSlide = slides[index];
+  const currentStep = currentSlide?.type === "exercise" ? currentSlide.step : undefined;
   const workSeconds = useMemo(
     () => (currentStep ? parseWorkSeconds(currentStep.prescription) : null),
     [currentStep]
@@ -85,6 +141,21 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
     ? phase === "work" ? 20 : 10
     : workSeconds;
   const isTimed = tabata || workSeconds != null;
+
+  const goToSlide = (targetIndex: number, jump = false) => {
+    const nextIndex = Math.max(0, Math.min(targetIndex, slides.length - 1));
+    setRunning(false);
+    emblaApi?.scrollTo(nextIndex, jump);
+    if (!emblaApi) setIndex(nextIndex);
+  };
+
+  const restartPlayer = () => {
+    setPhase("work");
+    setRemaining(null);
+    setRunning(false);
+    emblaApi?.scrollTo(0, true);
+    setIndex(0);
+  };
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -98,12 +169,19 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
     if (open && emblaApi) {
       emblaApi.scrollTo(0, true);
       setIndex(0);
+      emblaApi.reInit();
     }
-  }, [open, emblaApi]);
+  }, [open, emblaApi, slides.length]);
 
   // When step changes: reset phase/timer, auto-start if timed
   useEffect(() => {
     if (!open) return;
+    if (!currentSlide || currentSlide.type === "section-break") {
+      setPhase("work");
+      setRemaining(null);
+      setRunning(false);
+      return;
+    }
     setPhase("work");
     if (tabata) {
       setRemaining(20);
@@ -115,7 +193,7 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
       setRemaining(null);
       setRunning(false);
     }
-  }, [index, open, tabata, workSeconds]);
+  }, [currentSlide, index, open, tabata, workSeconds]);
 
   // Timer tick
   useEffect(() => {
@@ -127,9 +205,10 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
         setRemaining(10);
         return;
       }
-      // Advance to next exercise, or stop at end
-      if (index < steps.length - 1) {
-        emblaApi?.scrollNext();
+      // Advance immediately. If the next slide is a section break, the next
+      // effect stops the timer and waits for a manual Continue.
+      if (index < slides.length - 1) {
+        emblaApi?.scrollTo(index + 1, true);
       } else {
         setRunning(false);
       }
@@ -139,22 +218,23 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
     return () => {
       if (tickRef.current) window.clearTimeout(tickRef.current);
     };
-  }, [running, remaining, tabata, phase, index, steps.length, emblaApi]);
+  }, [running, remaining, tabata, phase, index, slides.length, emblaApi]);
 
   // Keyboard navigation
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onOpenChange(false);
-      if (e.key === "ArrowRight") emblaApi?.scrollNext();
-      if (e.key === "ArrowLeft") emblaApi?.scrollPrev();
-      if (e.key === " ") { e.preventDefault(); setRunning(r => !r); }
+      if (e.key === "ArrowRight") goToSlide(index + 1);
+      if (e.key === "ArrowLeft") goToSlide(index - 1);
+      if (e.key === " " && isTimed) { e.preventDefault(); setRunning(r => !r); }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, emblaApi, onOpenChange]);
+  }, [open, emblaApi, onOpenChange, index, isTimed, slides.length]);
 
   const total = steps.length;
+  const activeStepIndex = currentSlide?.type === "exercise" ? currentSlide.stepIndex : currentSlide?.afterStepIndex ?? -1;
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -164,14 +244,15 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl w-[95vw] p-0 gap-0 overflow-hidden">
+      <DialogContent className="max-w-2xl w-[95vw] p-0 gap-0 overflow-hidden [&>button:last-child]:hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <div className="min-w-0 flex-1">
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground truncate">{title}</p>
             <p className="text-sm font-medium truncate">
-              {currentStep?.section ? `${currentStep.section} · ` : ""}
-              Exercise {index + 1} of {total}
+              {currentSlide?.type === "section-break"
+                ? `${currentSlide.completedSection} complete`
+                : `${normalizeSection(currentStep?.section)} · Exercise ${(currentSlide as Extract<PlayerSlide, { type: "exercise" }> | undefined)?.stepIndex != null ? (currentSlide as Extract<PlayerSlide, { type: "exercise" }>).stepIndex + 1 : 1} of ${total}`}
             </p>
           </div>
           <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} aria-label="Close player" className="shrink-0">
@@ -182,20 +263,35 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
         {/* Progress */}
         <div className="flex gap-1 px-3 py-2">
           {steps.map((_, i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= index ? "bg-primary" : "bg-muted"}`} />
+            <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= activeStepIndex ? "bg-primary" : "bg-muted"}`} />
           ))}
         </div>
 
         {/* Carousel */}
         <div className="relative overflow-hidden" ref={emblaRef}>
           <div className="flex">
-            {steps.map((step, i) => {
+            {slides.map((slide, i) => {
+              if (slide.type === "section-break") {
+                return (
+                  <div key={`break-${i}`} className="flex-[0_0_100%] min-w-0 flex flex-col items-center justify-center text-center px-8 py-12" style={{ minHeight: "min(50vh, 340px)" }}>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Section complete</p>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-3">{slide.completedSection}</h2>
+                    <p className="text-sm text-muted-foreground mb-6">Next: {slide.nextSection}</p>
+                    <Button onClick={() => goToSlide(index + 1, true)} className="gap-2">
+                      Continue
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                );
+              }
+              const step = slide.step;
               const m = step.exerciseId ? media[step.exerciseId] : undefined;
               const gif = m?.gif_url;
               const fallback = m?.frame_start_url;
               const displayName = (step.name && step.name.trim()) || m?.name || "Exercise";
               return (
-                <div key={i} className="flex-[0_0_100%] min-w-0 flex flex-col items-center px-4 pt-3 pb-2">
+                <div key={`step-${slide.stepIndex}`} className="flex-[0_0_100%] min-w-0 flex flex-col items-center px-4 pt-3 pb-2">
+                  <p className="text-xs uppercase tracking-wide text-primary font-semibold mb-1">{normalizeSection(step.section)}</p>
                   <h2 className="text-lg md:text-xl font-semibold text-center">{displayName}</h2>
                   {step.prescription && (
                     <p className="text-sm text-muted-foreground mt-0.5">{step.prescription}</p>
@@ -219,7 +315,7 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
           {/* Side arrows */}
           <button
             type="button"
-            onClick={() => emblaApi?.scrollPrev()}
+            onClick={() => goToSlide(index - 1)}
             disabled={index === 0}
             aria-label="Previous exercise"
             className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-background/80 border border-border shadow hover:bg-background disabled:opacity-30"
@@ -228,8 +324,8 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
           </button>
           <button
             type="button"
-            onClick={() => emblaApi?.scrollNext()}
-            disabled={index === total - 1}
+            onClick={() => goToSlide(index + 1)}
+            disabled={index === slides.length - 1}
             aria-label="Next exercise"
             className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-full bg-background/80 border border-border shadow hover:bg-background disabled:opacity-30"
           >
@@ -250,9 +346,19 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
                 </p>
               </div>
             ) : (
-              <p className="text-xs text-muted-foreground">Manual — tap Next when done</p>
+              <p className="text-xs text-muted-foreground">
+                {currentSlide?.type === "section-break" ? "Manual — continue when ready" : "Manual — tap Next when done"}
+              </p>
             )}
           </div>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={restartPlayer}
+            aria-label="Start over"
+          >
+            <SkipBack className="h-4 w-4" />
+          </Button>
           {isTimed && (
             <>
               <Button
@@ -279,13 +385,13 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
           )}
           <Button
             onClick={() => {
-              if (index < total - 1) emblaApi?.scrollNext();
+              if (index < slides.length - 1) goToSlide(index + 1, true);
               else onOpenChange(false);
             }}
             aria-label="Skip / Next"
           >
             <SkipForward className="h-4 w-4 mr-1" />
-            {index === total - 1 ? "Finish" : "Next"}
+            {index === slides.length - 1 ? "Finish" : currentSlide?.type === "section-break" ? "Continue" : "Next"}
           </Button>
         </div>
       </DialogContent>
