@@ -384,7 +384,7 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
                 size="icon"
                 onClick={() => {
                   setPhase("work");
-                  setRemaining(activeDuration ?? null);
+                  setRemaining(tabata ? 20 : workSeconds ?? null);
                   setRunning(false);
                 }}
                 aria-label="Reset timer"
