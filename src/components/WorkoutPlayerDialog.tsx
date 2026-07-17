@@ -4,7 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import type { WorkoutStep } from "@/utils/parseWorkoutSteps";
 
 interface WorkoutPlayerDialogProps {
@@ -173,6 +173,15 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
     }
   }, [open, emblaApi, slides.length]);
 
+  useEffect(() => {
+    if (!open) {
+      setRunning(false);
+      setRemaining(null);
+      setPhase("work");
+      if (tickRef.current) window.clearTimeout(tickRef.current);
+    }
+  }, [open]);
+
   // When step changes: reset phase/timer, auto-start if timed
   useEffect(() => {
     if (!open) return;
@@ -244,7 +253,8 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl w-[95vw] p-0 gap-0 overflow-hidden [&>button:last-child]:hidden">
+      <DialogContent aria-describedby={undefined} className="max-w-2xl w-[95vw] p-0 gap-0 overflow-hidden [&>button:last-child]:hidden">
+        <DialogTitle className="sr-only">Workout player</DialogTitle>
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <div className="min-w-0 flex-1">
