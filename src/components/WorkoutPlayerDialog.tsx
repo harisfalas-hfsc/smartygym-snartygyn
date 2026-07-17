@@ -110,9 +110,9 @@ function parseWorkSeconds(prescription: string): number | null {
   return null;
 }
 
-function isTabataSection(section?: string): boolean {
-  if (!section) return false;
-  return /tabata/i.test(section);
+function isTabataStep(step?: WorkoutStep): boolean {
+  if (!step) return false;
+  return /tabata/i.test(`${step.section || ""} ${step.subSection || ""} ${step.prescription || ""}`);
 }
 
 export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: WorkoutPlayerDialogProps) {
@@ -136,7 +136,7 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
     () => (currentStep ? parseWorkSeconds(currentStep.prescription) : null),
     [currentStep]
   );
-  const tabata = isTabataSection(currentStep?.section);
+  const tabata = isTabataStep(currentStep);
   const isTimed = tabata || workSeconds != null;
 
   const goToSlide = (targetIndex: number, jump = false) => {
@@ -299,6 +299,9 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
               return (
                 <div key={`step-${slide.stepIndex}`} className="flex-[0_0_100%] min-w-0 flex flex-col items-center px-4 pt-3 pb-2">
                   <p className="text-xs uppercase tracking-wide text-primary font-semibold mb-1">{normalizeSection(step.section)}</p>
+                  {step.subSection && (
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{step.subSection}</p>
+                  )}
                   <h2 className="text-lg md:text-xl font-semibold text-center">{displayName}</h2>
                   {step.prescription && (
                     <p className="text-sm text-muted-foreground mt-0.5">{step.prescription}</p>
