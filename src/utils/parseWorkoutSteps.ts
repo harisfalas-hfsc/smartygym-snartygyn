@@ -39,6 +39,7 @@ function getCanonicalWorkoutSection(text: string): string | undefined {
     .toLowerCase()
     .replace(/[()\[\]{}:]/g, " ")
     .replace(/\d+\s*(?:'|minutes?|mins?|m)\b/g, " ")
+    .replace(/^[^a-z0-9]+|[^a-z0-9]+$/gi, "")
     .replace(/\s+/g, " ")
     .trim();
 
