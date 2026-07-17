@@ -333,21 +333,23 @@ export const WorkoutDisplay = ({
                   {workoutSteps.length > 0 && (
                     <Button
                       size="sm"
-                      className="gap-2"
+                      className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
                       onClick={() => openPlayer("Workout", workoutContentHtml)}
+                      aria-label="Player Mode"
                     >
                       <Play className="h-4 w-4" />
-                      <span>Player</span>
+                      <span className="hidden lg:inline">Player</span>
                     </Button>
                   )}
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2"
+                    className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
                     onClick={() => openReader("Workout", workoutContentHtml)}
+                    aria-label="Reader Mode"
                   >
                     <BookOpen className="h-4 w-4" />
-                    <span>Reader</span>
+                    <span className="hidden lg:inline">Reader</span>
                   </Button>
                 </div>
               </div>
@@ -377,11 +379,12 @@ export const WorkoutDisplay = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2 shrink-0"
+                  className="gap-2 shrink-0 max-lg:h-9 max-lg:w-9 max-lg:p-0"
                   onClick={() => openReader("Training Program", trainingScheduleHtml)}
+                  aria-label="Reader Mode"
                 >
                   <BookOpen className="h-4 w-4" />
-                  <span className="hidden sm:inline">Reader Mode</span>
+                  <span className="hidden lg:inline">Reader Mode</span>
                 </Button>
               </div>
             </CardHeader>
@@ -406,11 +409,12 @@ export const WorkoutDisplay = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="gap-2 shrink-0"
+                  className="gap-2 shrink-0 max-lg:h-9 max-lg:w-9 max-lg:p-0"
                   onClick={() => openReader("Training Program", personalProgramHtml)}
+                  aria-label="Reader Mode"
                 >
                   <BookOpen className="h-4 w-4" />
-                  <span className="hidden sm:inline">Reader Mode</span>
+                  <span className="hidden lg:inline">Reader Mode</span>
                 </Button>
               </div>
             </CardHeader>
