@@ -10,7 +10,7 @@ export interface WorkoutStep {
   section?: string; // e.g. "Warm-up", "Main Workout"
 }
 
-const EXERCISE_RE = /\{\{exercise:([^:}]+):([^}]+)\}\}/gi;
+const EXERCISE_RE = /\{\{exercise:([^:}]+):([^}]*)\}\}/gi;
 
 function stripHtml(html: string): string {
   const div = document.createElement("div");
@@ -19,13 +19,18 @@ function stripHtml(html: string): string {
 }
 
 function extractPrescription(text: string, exerciseName: string): string {
-  // Remove the exercise name from the text; what's left is the prescription
-  const cleaned = text
-    .replace(new RegExp(exerciseName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"), "")
+  // Strip any raw exercise placeholders first
+  let cleaned = text.replace(/\{\{exercise:[^}]*\}\}/gi, " ");
+  if (exerciseName) {
+    cleaned = cleaned.replace(
+      new RegExp(exerciseName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"),
+      ""
+    );
+  }
+  return cleaned
     .replace(/^[\s\-–—:•·|,.]+|[\s\-–—:•·|,.]+$/g, "")
     .replace(/\s+/g, " ")
     .trim();
-  return cleaned;
 }
 
 export function parseWorkoutSteps(html: string): WorkoutStep[] {
