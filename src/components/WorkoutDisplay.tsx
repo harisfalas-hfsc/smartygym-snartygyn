@@ -154,6 +154,11 @@ export const WorkoutDisplay = ({
     title: "",
     content: "",
   });
+  const [player, setPlayer] = useState<{ open: boolean; title: string; steps: WorkoutStep[] }>({
+    open: false,
+    title: "",
+    steps: [],
+  });
 
   const workoutContentHtml = joinWorkoutSections([activation, warm_up, main_workout, finisher, cool_down]);
   const trainingScheduleHtml = weekly_schedule ? normalizeWorkoutHtml(weekly_schedule) : '';
@@ -173,6 +178,18 @@ export const WorkoutDisplay = ({
       },
     });
   };
+
+  const openPlayer = (sectionTitle: string, html: string) => {
+    const steps = parseWorkoutSteps(html);
+    if (!steps.length) return;
+    setPlayer({
+      open: true,
+      title: title ? `${title} — ${sectionTitle}` : sectionTitle,
+      steps,
+    });
+  };
+
+  const workoutSteps = workoutContentHtml ? parseWorkoutSteps(workoutContentHtml) : [];
 
   const getDifficultyText = (diff: number) => {
     if (diff <= 2) return 'Beginner';
