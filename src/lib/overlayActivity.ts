@@ -1,52 +1,32 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export const HIGH_PRIORITY_OVERLAY_EVENT = "smarty-high-priority-overlay-change";
+// LIFO overlay stacking: every time an overlay opens it grabs the next
+// z-index in the sequence, so the most recently opened overlay is always on
+// top and can be closed first. No priority, no blocking between overlays.
 
-const activeOverlayCounts = new Map<string, number>();
+const BASE_Z = 50;
+let counter = 0;
 
-function activeOverlayTotal() {
-  return Array.from(activeOverlayCounts.values()).reduce((sum, count) => sum + count, 0);
+function nextZ() {
+  counter += 1;
+  return BASE_Z + counter;
 }
 
-function publishOverlayState() {
-  if (typeof document === "undefined" || typeof window === "undefined") return;
-
-  const active = activeOverlayTotal() > 0;
-  document.body.dataset.smartyHighPriorityOverlay = active ? "true" : "false";
-  window.dispatchEvent(
-    new CustomEvent(HIGH_PRIORITY_OVERLAY_EVENT, {
-      detail: {
-        active,
-        overlays: Array.from(activeOverlayCounts.keys()),
-      },
-    }),
-  );
-}
-
-export function hasHighPriorityOverlayOpen() {
-  if (typeof document === "undefined") return false;
-  return document.body.dataset.smartyHighPriorityOverlay === "true" || activeOverlayTotal() > 0;
-}
-
-function setHighPriorityOverlayActive(id: string, active: boolean) {
-  if (typeof window === "undefined") return;
-
-  const current = activeOverlayCounts.get(id) || 0;
-  if (active) {
-    activeOverlayCounts.set(id, current + 1);
-  } else if (current <= 1) {
-    activeOverlayCounts.delete(id);
-  } else {
-    activeOverlayCounts.set(id, current - 1);
-  }
-
-  publishOverlayState();
-}
-
-export function useHighPriorityOverlay(id: string, active: boolean) {
+/**
+ * Returns a stable z-index for the current open lifecycle of an overlay.
+ * The z-index is assigned when `active` flips to true and stays until it
+ * flips to false, so later-opened overlays sit above earlier ones (LIFO).
+ */
+export function useOverlayZIndex(active: boolean): number {
+  const [z, setZ] = useState<number>(BASE_Z);
   useEffect(() => {
-    if (!active) return;
-    setHighPriorityOverlayActive(id, true);
-    return () => setHighPriorityOverlayActive(id, false);
-  }, [id, active]);
+    if (active) setZ(nextZ());
+  }, [active]);
+  return z;
 }
+
+// Back-compat no-op exports (previous priority system). Kept so lingering
+// imports don't break; they no longer block or reorder anything.
+export const HIGH_PRIORITY_OVERLAY_EVENT = "smarty-high-priority-overlay-change";
+export function hasHighPriorityOverlayOpen() { return false; }
+export function useHighPriorityOverlay(_id: string, _active: boolean) { /* no-op */ }

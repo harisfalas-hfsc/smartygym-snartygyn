@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ExternalLink, Sparkles, ChevronLeft } from "lucide-react";
 import logoMove from "@/assets/smartymove-logo.png";
 import logoDiet from "@/assets/smartydiet-logo.png";
 import logoGym from "@/assets/smarty-gym-logo.png";
-import { HIGH_PRIORITY_OVERLAY_EVENT, hasHighPriorityOverlayOpen } from "@/lib/overlayActivity";
+import { useOverlayZIndex } from "@/lib/overlayActivity";
 
 // Change this constant when porting the component to the other two projects.
 const CURRENT_APP: "gym" | "move" | "diet" = "gym";
@@ -45,57 +45,26 @@ const DELAY_MS = 20000;
 export const SisterAppsPopup = () => {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [blockedByPriorityOverlay, setBlockedByPriorityOverlay] = useState(false);
-  const pendingOpenRef = useRef(false);
+  const zIndex = useOverlayZIndex(open);
 
   useEffect(() => {
     const t = window.setTimeout(() => {
       setMounted(true);
-      if (hasHighPriorityOverlayOpen()) {
-        pendingOpenRef.current = true;
-        setBlockedByPriorityOverlay(true);
-        setOpen(false);
-        return;
-      }
       setOpen(true);
     }, DELAY_MS);
     return () => window.clearTimeout(t);
   }, []);
 
-  useEffect(() => {
-    const syncWithPriorityOverlays = () => {
-      const blocked = hasHighPriorityOverlayOpen();
-      setBlockedByPriorityOverlay(blocked);
-
-      if (blocked) {
-        setOpen((wasOpen) => {
-          if (wasOpen) pendingOpenRef.current = true;
-          return false;
-        });
-        return;
-      }
-
-      if (pendingOpenRef.current) {
-        pendingOpenRef.current = false;
-        setMounted(true);
-        setOpen(true);
-      }
-    };
-
-    syncWithPriorityOverlays();
-    window.addEventListener(HIGH_PRIORITY_OVERLAY_EVENT, syncWithPriorityOverlays);
-    return () => window.removeEventListener(HIGH_PRIORITY_OVERLAY_EVENT, syncWithPriorityOverlays);
-  }, []);
-
   const others = SISTER_APPS.filter((a) => a.id !== CURRENT_APP);
 
-  if (!mounted || blockedByPriorityOverlay) return null;
+  if (!mounted) return null;
 
   return (
     <>
       <div
         aria-hidden={!open}
-        className={`fixed top-1/2 -translate-y-1/2 left-0 z-[45] flex items-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "translate-x-0" : "-translate-x-[calc(100%+10px)]"}`}
+        style={{ zIndex }}
+        className={`fixed top-1/2 -translate-y-1/2 left-0 flex items-center transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? "translate-x-0" : "-translate-x-[calc(100%+10px)]"}`}
       >
         <aside className="w-[260px] pl-4 pr-2 py-4 bg-white rounded-r-2xl shadow-[4px_0_24px_rgba(15,23,42,0.12)]">
           <div className="mb-4">
@@ -148,14 +117,16 @@ export const SisterAppsPopup = () => {
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Show sister apps"
-        className={`fixed top-1/2 -translate-y-1/2 left-0 z-[44] w-2 h-24 rounded-r-full bg-primary shadow-[0_0_28px_hsl(var(--primary)/0.65)] hover:w-3 hover:bg-primary transition-all duration-300 ${open ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+        style={{ zIndex: Math.max(1, zIndex - 1) }}
+        className={`fixed top-1/2 -translate-y-1/2 left-0 w-2 h-24 rounded-r-full bg-primary shadow-[0_0_28px_hsl(var(--primary)/0.65)] hover:w-3 hover:bg-primary transition-all duration-300 ${open ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       />
       {!open && (
         <button
           type="button"
           onClick={() => setOpen(true)}
           aria-label="Show sister apps"
-          className="fixed top-1/2 -translate-y-1/2 left-0 z-[43] w-6 h-20 opacity-0"
+          style={{ zIndex: Math.max(1, zIndex - 2) }}
+          className="fixed top-1/2 -translate-y-1/2 left-0 w-6 h-20 opacity-0"
         />
       )}
     </>

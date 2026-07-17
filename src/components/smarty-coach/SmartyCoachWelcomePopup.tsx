@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SmartyCoachModal } from "./SmartyCoachModal";
-import { HIGH_PRIORITY_OVERLAY_EVENT, hasHighPriorityOverlayOpen } from "@/lib/overlayActivity";
 const INITIAL_DELAY_MS = 1500;
 const NEVER_KEY = "smarty-welcome-never";
 const SESSION_ANON_KEY = "smarty-welcome-shown-anon";
@@ -24,7 +23,6 @@ export const SmartyCoachWelcomePopup = () => {
   const [open, setOpen] = useState(false);
   const lastUserIdRef = useRef<string | null>(null);
   const isBlockedRouteRef = useRef(false);
-  const pendingShowRef = useRef<{ hasPending: boolean; userId: string | null }>({ hasPending: false, userId: null });
   // Auto-open once per browser session on both mobile and desktop.
   const isBlockedRoute = BLOCKED_ROUTE_PREFIXES.some(p => location.pathname.startsWith(p));
 
@@ -45,26 +43,9 @@ export const SmartyCoachWelcomePopup = () => {
       if (sessionStorage.getItem(key)) return;
     } catch {}
 
-    if (hasHighPriorityOverlayOpen()) {
-      pendingShowRef.current = { hasPending: true, userId: forUserId };
-      return;
-    }
-
     setOpen(true);
     try { sessionStorage.setItem(key, "1"); } catch {}
   }, []);
-
-  useEffect(() => {
-    const showPendingWhenAvailable = () => {
-      if (hasHighPriorityOverlayOpen() || isBlockedRouteRef.current || !pendingShowRef.current.hasPending) return;
-      const userId = pendingShowRef.current.userId;
-      pendingShowRef.current = { hasPending: false, userId: null };
-      void tryShow(userId);
-    };
-
-    window.addEventListener(HIGH_PRIORITY_OVERLAY_EVENT, showPendingWhenAvailable);
-    return () => window.removeEventListener(HIGH_PRIORITY_OVERLAY_EVENT, showPendingWhenAvailable);
-  }, [tryShow]);
 
   // Initial landing trigger
   useEffect(() => {
