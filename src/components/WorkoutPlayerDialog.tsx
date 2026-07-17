@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import type { WorkoutStep } from "@/utils/parseWorkoutSteps";
-import { useHighPriorityOverlay } from "@/lib/overlayActivity";
+import { useOverlayZIndex } from "@/lib/overlayActivity";
 
 interface WorkoutPlayerDialogProps {
   open: boolean;
@@ -117,7 +117,7 @@ function isTabataStep(step?: WorkoutStep): boolean {
 }
 
 export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: WorkoutPlayerDialogProps) {
-  useHighPriorityOverlay("workout-player", open);
+  const zIndex = useOverlayZIndex(open);
 
   const slides = useMemo(() => buildPlayerSlides(steps), [steps]);
   const ids = useMemo(
@@ -252,8 +252,8 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent aria-describedby={undefined} className="!z-[70] max-w-2xl w-[95vw] p-0 gap-0 overflow-hidden [&>button:last-child]:hidden">
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
+      <DialogContent aria-describedby={undefined} style={{ zIndex }} className="max-w-2xl w-[95vw] p-0 gap-0 overflow-hidden [&>button:last-child]:hidden">
         <DialogTitle className="sr-only">Workout player</DialogTitle>
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
