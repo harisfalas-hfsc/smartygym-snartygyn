@@ -514,11 +514,13 @@ export const DesktopAboutContent = ({ showPremiumCta = false }: { showPremiumCta
             <CardContent className="p-10 md:p-16 md:pt-24 text-center space-y-6 relative">
               <div className="flex items-center justify-center gap-2">
                 <Sparkles className="h-6 w-6 text-primary" />
-                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight">Ready to Start Your Journey?</h2>
+                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight">{isPremium ? "Continue Your Journey" : "Ready to Start Your Journey?"}</h2>
                 <Sparkles className="h-6 w-6 text-primary" />
               </div>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-                Join thousands of people who are training smarter with SmartyGym.
+                {isPremium
+                  ? "Continue training smarter with thousands of SmartyGym members."
+                  : "Join thousands of people who are training smarter with SmartyGym."}
               </p>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Work with a real coach who designed every program personally — not an AI.
