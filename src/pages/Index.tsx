@@ -1580,7 +1580,9 @@ const Index = () => {
                 <Sparkles className="h-6 w-6 text-primary" />
               </div>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-                Join thousands of people who are training smarter with SmartyGym.
+                {isPremium
+                  ? "Continue training smarter with thousands of SmartyGym members."
+                  : "Join thousands of people who are training smarter with SmartyGym."}
               </p>
               <p className="text-muted-foreground max-w-2xl mx-auto">
                 Work with a real coach who designed every program personally — not an AI.
