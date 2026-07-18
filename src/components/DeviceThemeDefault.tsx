@@ -16,8 +16,11 @@ export const DeviceThemeDefault = () => {
     if (sessionTheme === "dark" || sessionTheme === "light") {
       setTheme(sessionTheme);
     } else {
-      setTheme("light");
-      sessionStorage.setItem("smartygym-session-theme", "light");
+      // Default: dark on mobile, dark on desktop (desktop is locked dark elsewhere).
+      const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches;
+      const defaultTheme = isMobile ? "dark" : "dark";
+      setTheme(defaultTheme);
+      sessionStorage.setItem("smartygym-session-theme", defaultTheme);
     }
   }, [setTheme]);
 
