@@ -1371,24 +1371,21 @@ const Index = () => {
 
           {/* The SmartyGym Promise */}
           <Card className="dark-band border-2 border-green-500 overflow-hidden relative rounded-2xl">
-            <CardContent className="p-5 md:p-8 relative">
-              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 md:gap-8">
-                <div className="flex-1">
-                  <p className="text-xs md:text-sm font-bold tracking-[0.3em] text-primary uppercase mb-2">Our Commitment</p>
-                  <h3 className="text-2xl md:text-3xl font-black uppercase tracking-tight">The SmartyGym Promise</h3>
-                </div>
-                <p className="text-base md:text-lg font-semibold text-primary tracking-wide md:text-right md:max-w-md">
-                  Real coaching. Real results. Anywhere you train.
+            <span aria-hidden="true" className="ghost-headline ghost-headline-on-dark absolute top-4 left-1/2 -translate-x-1/2 text-[60px] md:text-[110px] leading-none opacity-40 hidden md:block pointer-events-none whitespace-nowrap">
+              PROMISE
+            </span>
+            <CardContent className="p-8 md:p-10 md:pt-24 relative">
+              <p className="text-xs md:text-sm font-bold tracking-[0.3em] text-primary uppercase mb-3 text-center">Our Commitment</p>
+              <h3 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-8 text-center">The SmartyGym Promise</h3>
+              <div className="max-w-5xl mx-auto space-y-4">
+                <p className="text-base md:text-lg leading-relaxed text-center">
+                  Every workout and training program at <span className="text-primary font-semibold">SmartyGym</span> is crafted with one goal: to help you reach YOUR fitness goals, whatever they may be. Whether you're building muscle, losing weight, improving endurance, or simply staying active, we provide the structure, guidance, and flexibility you need to succeed — on your terms, in your time, wherever you are.
                 </p>
-              </div>
-              <div className="mt-5 md:mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <p className="text-sm md:text-base leading-relaxed text-foreground/90">
-                  Every workout and training program at <span className="text-primary font-semibold">SmartyGym</span> is crafted with one goal: to help you reach YOUR fitness goals,
-                  whatever they may be. Whether you're building muscle, losing weight, improving endurance, or simply staying active,
-                  we provide the structure, guidance, and flexibility you need to succeed — on your terms, in your time, wherever you are.
-                </p>
-                <p className="text-sm md:text-base leading-relaxed text-foreground/90">
+                <p className="text-base md:text-lg leading-relaxed text-center">
                   This promise also means we never stop developing SmartyGym — adding new workouts, training programs, tools, and blog articles — and staying on top of the latest trends and science-based evidence so you always have the most current, effective approach to your fitness.
+                </p>
+                <p className="text-base md:text-lg font-semibold text-center text-primary tracking-wide">
+                  Real coaching. Real results. Anywhere you train.
                 </p>
               </div>
             </CardContent>
