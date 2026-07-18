@@ -1576,7 +1576,7 @@ const Index = () => {
             <CardContent className="p-10 md:p-16 md:pt-24 text-center space-y-6 relative">
               <div className="flex items-center justify-center gap-2">
                 <Sparkles className="h-6 w-6 text-primary" />
-                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight">Ready to Start Your Journey?</h2>
+                <h2 className="text-3xl md:text-5xl font-black uppercase tracking-tight">{isPremium ? "Continue Your Journey" : "Ready to Start Your Journey?"}</h2>
                 <Sparkles className="h-6 w-6 text-primary" />
               </div>
               <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -1594,7 +1594,7 @@ const Index = () => {
                   <Calendar className="h-5 w-5" />
                   Explore Programs
                 </Button>
-                {!isPremium && <Button size="lg" variant="outline" onClick={() => navigate("/smarty-premium")} className="gap-2 rounded-full px-8 uppercase tracking-wider font-bold border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+                {!isPremium && <Button size="lg" onClick={() => navigate("/smarty-premium")} className="gap-2 rounded-full px-8 uppercase tracking-wider font-bold border-2 border-[#B8892B] bg-gradient-to-b from-[#F5D67A] via-[#D4A94A] to-[#B8892B] text-black hover:brightness-110 shadow-[0_4px_14px_rgba(184,137,43,0.45)]">
                     <UserCheck className="h-5 w-5" />
                     Join Premium
                   </Button>}
