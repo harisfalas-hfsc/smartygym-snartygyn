@@ -286,6 +286,8 @@ export const SmartyCoachModal = ({ isOpen, onClose, initialPath = 'menu' }: Smar
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleDismiss()} modal={false}>
       <DialogContent
         style={{ zIndex }}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
         className={cn(
           "p-0 border-0 overflow-hidden",
           // Use small/dynamic viewport units for consistent mobile-browser chrome behavior.
