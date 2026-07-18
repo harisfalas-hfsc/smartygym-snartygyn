@@ -253,7 +253,14 @@ export function WorkoutPlayerDialog({ open, onOpenChange, title, steps }: Workou
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
-      <DialogContent aria-describedby={undefined} style={{ zIndex }} className="max-w-2xl w-[95vw] p-0 gap-0 overflow-hidden [&>button:last-child]:hidden">
+      <DialogContent
+        aria-describedby={undefined}
+        style={{ zIndex }}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        className="max-w-2xl w-[95vw] p-0 gap-0 overflow-hidden [&>button:last-child]:hidden"
+      >
         <DialogTitle className="sr-only">Workout player</DialogTitle>
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
