@@ -423,6 +423,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
 
           <div className="grid grid-cols-2 gap-1.5">
             <div className="h-10 flex items-center justify-center gap-2 rounded-md hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this program">
+              <Star className={`w-4 h-4 ${rating > 0 ? 'fill-yellow-500 text-yellow-500' : ''}`} />
               <span className="text-xs font-medium">Rate</span>
               <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
@@ -432,7 +433,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
                     className="focus:outline-none transition-transform hover:scale-110 p-0.5"
                     aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
                   >
-                    <Star className={`w-4 h-4 ${star <= rating ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground/50'}`} />
+                    <Star className={`w-3 h-3 ${star <= rating ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground/50'}`} />
                   </button>
                 ))}
               </div>
