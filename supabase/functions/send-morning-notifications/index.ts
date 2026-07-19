@@ -591,18 +591,8 @@ serve(async (req) => {
     for (const authUser of usersData?.users || []) {
       userIndex++;
       if (!authUser.email) continue;
-
-      // Skip test/dummy addresses — Resend rejects reserved domains (example.com, test, etc.)
-      const emailLower = authUser.email.toLowerCase();
-      if (
-        emailLower.endsWith("@example.com") ||
-        emailLower.endsWith("@example.org") ||
-        emailLower.endsWith("@example.net") ||
-        emailLower.endsWith("@test.com") ||
-        emailLower.endsWith(".test") ||
-        emailLower.endsWith(".invalid") ||
-        emailLower.endsWith(".localhost")
-      ) {
+      // Skip IANA-reserved/unroutable domains that Resend rejects (example.com, .test, etc.)
+      if (isUnroutableEmail(authUser.email)) {
         emailsSkipped++;
         continue;
       }
