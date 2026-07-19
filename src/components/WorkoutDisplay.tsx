@@ -370,17 +370,6 @@ export const WorkoutDisplay = ({
                   💪 Workout
                 </CardTitle>
                 <div className="flex items-center gap-2 shrink-0">
-                  {workoutSteps.length > 0 && (
-                    <Button
-                      size="sm"
-                      className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
-                      onClick={() => openPlayer("Workout", workoutContentHtml, workoutSteps)}
-                      aria-label="Player Mode"
-                    >
-                      <Play className="h-4 w-4" />
-                      <span className="hidden lg:inline">Player</span>
-                    </Button>
-                  )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -417,17 +406,6 @@ export const WorkoutDisplay = ({
                   📆 Training Program
                 </CardTitle>
                 <div className="flex items-center gap-2 shrink-0">
-                  {trainingScheduleSteps.length > 0 && (
-                    <Button
-                      size="sm"
-                      className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
-                      onClick={() => openPlayer("Training Program", trainingScheduleHtml, trainingScheduleSteps)}
-                      aria-label="Player Mode"
-                    >
-                      <Play className="h-4 w-4" />
-                      <span className="hidden lg:inline">Player</span>
-                    </Button>
-                  )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -460,17 +438,6 @@ export const WorkoutDisplay = ({
                   📆 Training Program
                 </CardTitle>
                 <div className="flex items-center gap-2 shrink-0">
-                  {personalProgramSteps.length > 0 && (
-                    <Button
-                      size="sm"
-                      className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
-                      onClick={() => openPlayer("Training Program", personalProgramHtml, personalProgramSteps)}
-                      aria-label="Player Mode"
-                    >
-                      <Play className="h-4 w-4" />
-                      <span className="hidden lg:inline">Player</span>
-                    </Button>
-                  )}
                   <Button
                     variant="outline"
                     size="sm"
