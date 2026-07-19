@@ -332,7 +332,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
               size="sm"
               className="h-10 gap-2 justify-start px-3 lg:justify-center"
             >
-              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              <Heart className={`w-4 h-4 text-rose-500 dark:text-rose-400 ${isFavorite ? 'fill-current' : ''}`} />
               <span className="text-xs font-medium">{isFavorite ? 'Favorited' : 'Favorite'}</span>
             </Button>
 
@@ -342,7 +342,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
               size="sm"
               className="h-10 gap-2 justify-start px-3 lg:justify-center"
             >
-              <CalendarClock className="w-4 h-4" />
+              <CalendarClock className="w-4 h-4 text-sky-500 dark:text-sky-400" />
               <span className="text-xs font-medium truncate">
                 {scheduledWorkout ? format(new Date(scheduledWorkout.scheduled_date), 'MMM d') : 'Schedule'}
               </span>
@@ -354,13 +354,13 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
               size="sm"
               className="h-10 gap-2 justify-start px-3 lg:justify-center"
             >
-              <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'fill-current' : ''}`} />
+              <CheckCircle2 className={`w-4 h-4 text-emerald-500 dark:text-emerald-400 ${isCompleted ? 'fill-current' : ''}`} />
               <span className="text-xs font-medium">{isCompleted ? 'Completed' : 'Complete'}</span>
             </Button>
 
             <div className="col-span-2 lg:col-span-1 h-10 flex items-center justify-start gap-2 rounded-md px-3 hover:bg-accent/50 transition-colors lg:justify-center" role="group" aria-label="Rate this workout">
               <div className="flex items-center gap-1.5">
-                <Star className={`w-4 h-4 shrink-0 ${rating > 0 ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+                <Star className={`w-4 h-4 shrink-0 text-amber-500 dark:text-amber-400 ${rating > 0 ? 'fill-amber-500 dark:fill-amber-400' : ''}`} />
                 <span className="text-xs font-medium whitespace-nowrap">Rate workout</span>
               </div>
               <div className="flex items-center gap-0.5">
