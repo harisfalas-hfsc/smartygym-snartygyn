@@ -424,7 +424,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
           <div className="grid grid-cols-3 gap-1.5">
             <div className="col-span-2 h-10 flex items-center justify-start gap-2 rounded-md px-3 hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this program">
               <Star className={`w-4 h-4 ${rating > 0 ? 'fill-yellow-500 text-yellow-500' : ''}`} />
-              <span className="text-xs font-medium">Rate</span>
+              <span className="text-xs font-medium whitespace-nowrap">Rate this program</span>
               <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
