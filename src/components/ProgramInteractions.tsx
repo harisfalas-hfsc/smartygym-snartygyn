@@ -390,12 +390,12 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
         <div className="flex flex-col gap-1.5 p-2 bg-muted/60 rounded-lg border border-border">
           <div className="grid grid-cols-3 gap-1.5 lg:grid-cols-5 lg:flex-1">
             <Button onClick={toggleFavorite} variant={isFavorite ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-start px-3 lg:justify-center">
-              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              <Heart className={`w-4 h-4 text-rose-500 dark:text-rose-400 ${isFavorite ? 'fill-current' : ''}`} />
               <span className="text-xs font-medium">{isFavorite ? 'Favorited' : 'Favorite'}</span>
             </Button>
 
             <Button onClick={handleScheduleClick} variant={scheduledWorkout ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-start px-3 lg:justify-center">
-              <CalendarClock className="w-4 h-4" />
+              <CalendarClock className="w-4 h-4 text-sky-500 dark:text-sky-400" />
               <span className="text-xs font-medium truncate">
                 {scheduledWorkout ? format(new Date(scheduledWorkout.scheduled_date), 'MMM d') : 'Schedule'}
               </span>
@@ -403,7 +403,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
 
             {!isOngoing && !isCompleted && (
               <Button onClick={startProgram} variant="ghost" size="sm" className="h-10 gap-2 justify-start px-3 lg:justify-center">
-                <CheckCircle2 className="w-4 h-4" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
                 <span className="text-xs font-medium">Start</span>
               </Button>
             )}
@@ -422,7 +422,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
 
             <div className="col-span-2 lg:col-span-1 h-10 flex items-center justify-start gap-2 rounded-md px-3 hover:bg-accent/50 transition-colors lg:justify-center" role="group" aria-label="Rate this program">
               <div className="flex items-center gap-1.5">
-                <Star className={`w-4 h-4 shrink-0 ${rating > 0 ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+                <Star className={`w-4 h-4 shrink-0 text-amber-500 dark:text-amber-400 ${rating > 0 ? 'fill-amber-500 dark:fill-amber-400' : ''}`} />
                 <span className="text-xs font-medium whitespace-nowrap">Rate program</span>
               </div>
               <div className="flex items-center gap-0.5">

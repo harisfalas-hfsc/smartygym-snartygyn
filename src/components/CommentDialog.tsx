@@ -136,7 +136,7 @@ export const CommentDialog = ({
         size="sm"
         className={triggerClassName}
       >
-        <MessageSquare className="h-4 w-4" />
+        <MessageSquare className="h-4 w-4 text-violet-500 dark:text-violet-400" />
         Comment
       </Button>
 
