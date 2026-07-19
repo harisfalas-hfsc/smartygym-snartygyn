@@ -389,12 +389,12 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       <TooltipProvider delayDuration={150}>
         <div className="flex flex-col gap-1.5 p-2 bg-muted/60 rounded-lg border border-border">
           <div className="grid grid-cols-3 gap-1.5 lg:grid-cols-5 lg:flex-1">
-            <Button onClick={toggleFavorite} variant={isFavorite ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-start px-3">
+            <Button onClick={toggleFavorite} variant={isFavorite ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-start px-3 lg:justify-center">
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
               <span className="text-xs font-medium">{isFavorite ? 'Favorited' : 'Favorite'}</span>
             </Button>
 
-            <Button onClick={handleScheduleClick} variant={scheduledWorkout ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-start px-3">
+            <Button onClick={handleScheduleClick} variant={scheduledWorkout ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-start px-3 lg:justify-center">
               <CalendarClock className="w-4 h-4" />
               <span className="text-xs font-medium truncate">
                 {scheduledWorkout ? format(new Date(scheduledWorkout.scheduled_date), 'MMM d') : 'Schedule'}
@@ -402,25 +402,25 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
             </Button>
 
             {!isOngoing && !isCompleted && (
-              <Button onClick={startProgram} variant="ghost" size="sm" className="h-10 gap-2 justify-start px-3">
+              <Button onClick={startProgram} variant="ghost" size="sm" className="h-10 gap-2 justify-start px-3 lg:justify-center">
                 <CheckCircle2 className="w-4 h-4" />
                 <span className="text-xs font-medium">Start</span>
               </Button>
             )}
             {isOngoing && !isCompleted && (
-              <Button onClick={markComplete} size="sm" className="h-10 gap-2 justify-start px-3 bg-orange-500 hover:bg-orange-600 text-white">
+              <Button onClick={markComplete} size="sm" className="h-10 gap-2 justify-start px-3 bg-orange-500 hover:bg-orange-600 text-white lg:justify-center">
                 <CheckCircle2 className="w-4 h-4" />
                 <span className="text-xs font-medium">Complete</span>
               </Button>
             )}
             {isCompleted && (
-              <Button onClick={resetProgram} size="sm" className="h-10 gap-2 justify-start px-3 bg-green-500 hover:bg-green-600 text-white">
+              <Button onClick={resetProgram} size="sm" className="h-10 gap-2 justify-start px-3 bg-green-500 hover:bg-green-600 text-white lg:justify-center">
                 <CheckCircle2 className="w-4 h-4 fill-current" />
                 <span className="text-xs font-medium">Completed</span>
               </Button>
             )}
 
-            <div className="col-span-2 lg:col-span-1 h-10 flex items-center justify-start gap-2 rounded-md px-3 hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this program">
+            <div className="col-span-2 lg:col-span-1 h-10 flex items-center justify-start gap-2 rounded-md px-3 hover:bg-accent/50 transition-colors lg:justify-center" role="group" aria-label="Rate this program">
               <div className="flex items-center gap-1.5">
                 <Star className={`w-4 h-4 shrink-0 ${rating > 0 ? 'fill-yellow-500 text-yellow-500' : ''}`} />
                 <span className="text-xs font-medium whitespace-nowrap">Rate program</span>
@@ -444,7 +444,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
               programName={programName}
               programType={programType}
               triggerVariant="ghost"
-              triggerClassName="h-10 w-full gap-2 justify-start px-3 text-xs font-medium lg:h-full"
+              triggerClassName="h-10 w-full gap-2 justify-start px-3 text-xs font-medium lg:h-full lg:justify-center"
             />
           </div>
         </div>

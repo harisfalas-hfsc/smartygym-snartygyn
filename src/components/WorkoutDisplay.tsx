@@ -603,7 +603,7 @@ export const WorkoutDisplay = ({
             )}
           </div>
           {(workoutId || programId) && (
-            <div className="flex items-center justify-center">
+            <div className="w-full lg:p-2 lg:bg-muted/60 lg:rounded-lg lg:border lg:border-border">
               <ShareButtons
                 title={title}
                 url={typeof window !== 'undefined' ? window.location.href : 'https://smartygym.com'}
