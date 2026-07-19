@@ -600,6 +600,17 @@ export const WorkoutDisplay = ({
           />
         )}
 
+        {/* Compact share row — below interactions */}
+        {(workoutId || programId) && (
+          <div className="flex justify-end px-1">
+            <ShareButtons
+              title={title}
+              url={typeof window !== 'undefined' ? window.location.href : 'https://smartygym.com'}
+              compact
+            />
+          </div>
+        )}
+
         {/* PAR-Q Reminder */}
         <ParQReminder />
       </div>
