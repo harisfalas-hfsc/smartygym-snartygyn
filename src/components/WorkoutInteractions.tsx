@@ -330,7 +330,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
               onClick={toggleFavorite}
               variant={isFavorite ? "default" : "ghost"}
               size="sm"
-              className="h-10 gap-2 justify-start px-3"
+              className="h-10 gap-2 justify-start px-3 lg:justify-center"
             >
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
               <span className="text-xs font-medium">{isFavorite ? 'Favorited' : 'Favorite'}</span>
@@ -340,7 +340,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
               onClick={handleScheduleClick}
               variant={scheduledWorkout ? "default" : "ghost"}
               size="sm"
-              className="h-10 gap-2 justify-start px-3"
+              className="h-10 gap-2 justify-start px-3 lg:justify-center"
             >
               <CalendarClock className="w-4 h-4" />
               <span className="text-xs font-medium truncate">
@@ -352,13 +352,13 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
               onClick={toggleCompleted}
               variant={isCompleted ? "default" : "ghost"}
               size="sm"
-              className="h-10 gap-2 justify-start px-3"
+              className="h-10 gap-2 justify-start px-3 lg:justify-center"
             >
               <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'fill-current' : ''}`} />
               <span className="text-xs font-medium">{isCompleted ? 'Completed' : 'Complete'}</span>
             </Button>
 
-            <div className="col-span-2 lg:col-span-1 h-10 flex items-center justify-start gap-2 rounded-md px-3 hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this workout">
+            <div className="col-span-2 lg:col-span-1 h-10 flex items-center justify-start gap-2 rounded-md px-3 hover:bg-accent/50 transition-colors lg:justify-center" role="group" aria-label="Rate this workout">
               <div className="flex items-center gap-1.5">
                 <Star className={`w-4 h-4 shrink-0 ${rating > 0 ? 'fill-yellow-500 text-yellow-500' : ''}`} />
                 <span className="text-xs font-medium whitespace-nowrap">Rate workout</span>
@@ -388,7 +388,7 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
               workoutName={workoutName}
               workoutType={workoutType}
               triggerVariant="ghost"
-              triggerClassName="h-10 w-full gap-2 justify-start px-3 text-xs font-medium lg:h-full"
+              triggerClassName="h-10 w-full gap-2 justify-start px-3 text-xs font-medium lg:h-full lg:justify-center"
             />
           </div>
         </div>
