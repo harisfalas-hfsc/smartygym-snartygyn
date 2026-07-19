@@ -324,42 +324,45 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
   return (
     <>
       <TooltipProvider delayDuration={150}>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 p-2 bg-muted/60 rounded-lg border border-border">
-          <Button
-            onClick={toggleFavorite}
-            variant={isFavorite ? "default" : "ghost"}
-            size="sm"
-            className="h-10 gap-2 justify-center"
-          >
-            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-            <span className="text-xs font-medium">{isFavorite ? 'Favorited' : 'Favorite'}</span>
-          </Button>
+        <div className="flex flex-col gap-1.5 p-2 bg-muted/60 rounded-lg border border-border">
+          <div className="grid grid-cols-3 gap-1.5">
+            <Button
+              onClick={toggleFavorite}
+              variant={isFavorite ? "default" : "ghost"}
+              size="sm"
+              className="h-10 gap-2 justify-center"
+            >
+              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              <span className="text-xs font-medium">{isFavorite ? 'Favorited' : 'Favorite'}</span>
+            </Button>
 
-          <Button
-            onClick={handleScheduleClick}
-            variant={scheduledWorkout ? "default" : "ghost"}
-            size="sm"
-            className="h-10 gap-2 justify-center"
-          >
-            <CalendarClock className="w-4 h-4" />
-            <span className="text-xs font-medium truncate">
-              {scheduledWorkout ? format(new Date(scheduledWorkout.scheduled_date), 'MMM d') : 'Schedule'}
-            </span>
-          </Button>
+            <Button
+              onClick={handleScheduleClick}
+              variant={scheduledWorkout ? "default" : "ghost"}
+              size="sm"
+              className="h-10 gap-2 justify-center"
+            >
+              <CalendarClock className="w-4 h-4" />
+              <span className="text-xs font-medium truncate">
+                {scheduledWorkout ? format(new Date(scheduledWorkout.scheduled_date), 'MMM d') : 'Schedule'}
+              </span>
+            </Button>
 
-          <Button
-            onClick={toggleCompleted}
-            variant={isCompleted ? "default" : "ghost"}
-            size="sm"
-            className="h-10 gap-2 justify-center"
-          >
-            <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'fill-current' : ''}`} />
-            <span className="text-xs font-medium">{isCompleted ? 'Completed' : 'Complete'}</span>
-          </Button>
+            <Button
+              onClick={toggleCompleted}
+              variant={isCompleted ? "default" : "ghost"}
+              size="sm"
+              className="h-10 gap-2 justify-center"
+            >
+              <CheckCircle2 className={`w-4 h-4 ${isCompleted ? 'fill-current' : ''}`} />
+              <span className="text-xs font-medium">{isCompleted ? 'Completed' : 'Complete'}</span>
+            </Button>
+          </div>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="h-10 flex items-center justify-center gap-0.5 rounded-md hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this workout">
+          <div className="grid grid-cols-2 gap-1.5">
+            <div className="h-10 flex items-center justify-center gap-2 rounded-md hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this workout">
+              <span className="text-xs font-medium">Rate</span>
+              <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -377,15 +380,14 @@ export const WorkoutInteractions = ({ workoutId, workoutType, workoutName, isFre
                   </button>
                 ))}
               </div>
-            </TooltipTrigger>
-            <TooltipContent>{rating > 0 ? `Your rating: ${rating}/5` : 'Rate this workout'}</TooltipContent>
-          </Tooltip>
+            </div>
 
-          <div className="[&>button]:h-10 [&>button]:w-full [&>button]:justify-center">
             <CommentDialog
               workoutId={workoutId}
               workoutName={workoutName}
               workoutType={workoutType}
+              triggerVariant="ghost"
+              triggerClassName="h-10 w-full gap-2 justify-center text-xs font-medium"
             />
           </div>
         </div>

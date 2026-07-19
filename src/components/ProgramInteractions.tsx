@@ -387,41 +387,44 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
   return (
     <>
       <TooltipProvider delayDuration={150}>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 p-2 bg-muted/60 rounded-lg border border-border">
-          <Button onClick={toggleFavorite} variant={isFavorite ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-center">
-            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-            <span className="text-xs font-medium">{isFavorite ? 'Favorited' : 'Favorite'}</span>
-          </Button>
-
-          <Button onClick={handleScheduleClick} variant={scheduledWorkout ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-center">
-            <CalendarClock className="w-4 h-4" />
-            <span className="text-xs font-medium truncate">
-              {scheduledWorkout ? format(new Date(scheduledWorkout.scheduled_date), 'MMM d') : 'Schedule'}
-            </span>
-          </Button>
-
-          {!isOngoing && !isCompleted && (
-            <Button onClick={startProgram} variant="ghost" size="sm" className="h-10 gap-2 justify-center">
-              <CheckCircle2 className="w-4 h-4" />
-              <span className="text-xs font-medium">Start</span>
+        <div className="flex flex-col gap-1.5 p-2 bg-muted/60 rounded-lg border border-border">
+          <div className="grid grid-cols-3 gap-1.5">
+            <Button onClick={toggleFavorite} variant={isFavorite ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-center">
+              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              <span className="text-xs font-medium">{isFavorite ? 'Favorited' : 'Favorite'}</span>
             </Button>
-          )}
-          {isOngoing && !isCompleted && (
-            <Button onClick={markComplete} size="sm" className="h-10 gap-2 justify-center bg-orange-500 hover:bg-orange-600 text-white">
-              <CheckCircle2 className="w-4 h-4" />
-              <span className="text-xs font-medium">Complete</span>
-            </Button>
-          )}
-          {isCompleted && (
-            <Button onClick={resetProgram} size="sm" className="h-10 gap-2 justify-center bg-green-500 hover:bg-green-600 text-white">
-              <CheckCircle2 className="w-4 h-4 fill-current" />
-              <span className="text-xs font-medium">Completed</span>
-            </Button>
-          )}
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="h-10 flex items-center justify-center gap-0.5 rounded-md hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this program">
+            <Button onClick={handleScheduleClick} variant={scheduledWorkout ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-center">
+              <CalendarClock className="w-4 h-4" />
+              <span className="text-xs font-medium truncate">
+                {scheduledWorkout ? format(new Date(scheduledWorkout.scheduled_date), 'MMM d') : 'Schedule'}
+              </span>
+            </Button>
+
+            {!isOngoing && !isCompleted && (
+              <Button onClick={startProgram} variant="ghost" size="sm" className="h-10 gap-2 justify-center">
+                <CheckCircle2 className="w-4 h-4" />
+                <span className="text-xs font-medium">Start</span>
+              </Button>
+            )}
+            {isOngoing && !isCompleted && (
+              <Button onClick={markComplete} size="sm" className="h-10 gap-2 justify-center bg-orange-500 hover:bg-orange-600 text-white">
+                <CheckCircle2 className="w-4 h-4" />
+                <span className="text-xs font-medium">Complete</span>
+              </Button>
+            )}
+            {isCompleted && (
+              <Button onClick={resetProgram} size="sm" className="h-10 gap-2 justify-center bg-green-500 hover:bg-green-600 text-white">
+                <CheckCircle2 className="w-4 h-4 fill-current" />
+                <span className="text-xs font-medium">Completed</span>
+              </Button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-1.5">
+            <div className="h-10 flex items-center justify-center gap-2 rounded-md hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this program">
+              <span className="text-xs font-medium">Rate</span>
+              <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -433,15 +436,14 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
                   </button>
                 ))}
               </div>
-            </TooltipTrigger>
-            <TooltipContent>{rating > 0 ? `Your rating: ${rating}/5` : 'Rate this program'}</TooltipContent>
-          </Tooltip>
+            </div>
 
-          <div className="[&>button]:h-10 [&>button]:w-full [&>button]:justify-center">
             <CommentDialog
               programId={programId}
               programName={programName}
               programType={programType}
+              triggerVariant="ghost"
+              triggerClassName="h-10 w-full gap-2 justify-center text-xs font-medium"
             />
           </div>
         </div>

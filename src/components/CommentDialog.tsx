@@ -22,6 +22,8 @@ interface CommentDialogProps {
   programId?: string;
   programName?: string;
   programType?: string;
+  triggerVariant?: "default" | "ghost" | "outline";
+  triggerClassName?: string;
 }
 
 export const CommentDialog = ({
@@ -31,6 +33,8 @@ export const CommentDialog = ({
   programId,
   programName,
   programType,
+  triggerVariant = "outline",
+  triggerClassName = "gap-2 border-primary/30 hover:border-primary/50",
 }: CommentDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [comment, setComment] = useState("");
@@ -128,9 +132,9 @@ export const CommentDialog = ({
     <>
       <Button
         onClick={handleOpenDialog}
-        variant="outline"
+        variant={triggerVariant}
         size="sm"
-        className="gap-2 border-primary/30 hover:border-primary/50"
+        className={triggerClassName}
       >
         <MessageSquare className="h-4 w-4" />
         Comment
