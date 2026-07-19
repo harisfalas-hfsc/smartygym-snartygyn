@@ -388,7 +388,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
     <>
       <TooltipProvider delayDuration={150}>
         <div className="flex flex-col gap-1.5 p-2 bg-muted/60 rounded-lg border border-border">
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="grid grid-cols-3 gap-1.5 lg:grid-cols-5 lg:flex-1">
             <Button onClick={toggleFavorite} variant={isFavorite ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-start px-3">
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
               <span className="text-xs font-medium">{isFavorite ? 'Favorited' : 'Favorite'}</span>
@@ -419,12 +419,12 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
                 <span className="text-xs font-medium">Completed</span>
               </Button>
             )}
-          </div>
 
-          <div className="grid grid-cols-3 gap-1.5">
-            <div className="col-span-2 h-10 flex items-center justify-start gap-2 rounded-md px-3 hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this program">
-              <Star className={`w-4 h-4 shrink-0 ${rating > 0 ? 'fill-yellow-500 text-yellow-500' : ''}`} />
-              <span className="text-xs font-medium whitespace-nowrap">Rate program</span>
+            <div className="col-span-2 lg:col-span-1 h-10 lg:h-auto flex items-center justify-start gap-2 rounded-md px-3 hover:bg-accent/50 transition-colors lg:flex-col lg:items-start lg:justify-center lg:gap-0.5 lg:px-2 lg:py-1.5" role="group" aria-label="Rate this program">
+              <div className="flex items-center gap-1.5">
+                <Star className={`w-4 h-4 shrink-0 ${rating > 0 ? 'fill-yellow-500 text-yellow-500' : ''}`} />
+                <span className="text-xs font-medium whitespace-nowrap">Rate program</span>
+              </div>
               <div className="flex items-center gap-0.5">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -444,7 +444,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
               programName={programName}
               programType={programType}
               triggerVariant="ghost"
-              triggerClassName="h-10 w-full gap-2 justify-start px-3 text-xs font-medium"
+              triggerClassName="h-10 w-full gap-2 justify-start px-3 text-xs font-medium lg:h-full"
             />
           </div>
         </div>
