@@ -319,15 +319,6 @@ export const WorkoutDisplay = ({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         </div>
-        
-        {/* Share Buttons */}
-        <div className="flex flex-col gap-3">
-          <h3 className="text-sm font-semibold">Share this workout:</h3>
-          <ShareButtons 
-            title={title}
-            url={typeof window !== 'undefined' ? window.location.href : 'https://smartygym.com'}
-          />
-        </div>
       </div>
 
       {/* Workout Tools - Timer, 1RM Calculator, Exercise Library */}
@@ -352,7 +343,7 @@ export const WorkoutDisplay = ({
             className="mt-3 w-full flex items-center justify-center gap-3 p-3 rounded-lg shadow-md border-2 border-primary/40 bg-primary text-primary-foreground hover:bg-primary/90 hover:border-primary transition-all font-semibold text-sm sm:text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <Play className="h-5 w-5 fill-current" />
-            <span>Start your workout with the Player</span>
+            <span>Start your workout</span>
           </button>
         );
       })()}
@@ -607,6 +598,17 @@ export const WorkoutDisplay = ({
             programName={title}
             isFreeContent={isFreeContent}
           />
+        )}
+
+        {/* Compact share row — below interactions */}
+        {(workoutId || programId) && (
+          <div className="flex justify-end px-1">
+            <ShareButtons
+              title={title}
+              url={typeof window !== 'undefined' ? window.location.href : 'https://smartygym.com'}
+              compact
+            />
+          </div>
         )}
 
         {/* PAR-Q Reminder */}
