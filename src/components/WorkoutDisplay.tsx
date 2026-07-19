@@ -333,6 +333,30 @@ export const WorkoutDisplay = ({
       {/* Workout Tools - Timer, 1RM Calculator, Exercise Library */}
       <WorkoutToolsCards />
 
+      {/* Start Your Workout - big clickable bar aligned with tools bar */}
+      {(() => {
+        const playerTarget =
+          workoutSteps.length > 0
+            ? { label: "Workout", html: workoutContentHtml, steps: workoutSteps }
+            : trainingScheduleSteps.length > 0
+            ? { label: "Training Program", html: trainingScheduleHtml, steps: trainingScheduleSteps }
+            : personalProgramSteps.length > 0
+            ? { label: "Training Program", html: personalProgramHtml, steps: personalProgramSteps }
+            : null;
+        if (!playerTarget) return null;
+        return (
+          <button
+            type="button"
+            onClick={() => openPlayer(playerTarget.label, playerTarget.html, playerTarget.steps)}
+            aria-label="Start your workout with the Player"
+            className="mt-3 w-full flex items-center justify-center gap-3 p-3 rounded-lg shadow-md border-2 border-primary/40 bg-primary text-primary-foreground hover:bg-primary/90 hover:border-primary transition-all font-semibold text-sm sm:text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <Play className="h-5 w-5 fill-current" />
+            <span>Start your workout with the Player</span>
+          </button>
+        );
+      })()}
+
 
       {/* CONTENT SECTIONS - Display exactly as written, no automatic headers */}
       <div className="mt-8">
@@ -346,17 +370,6 @@ export const WorkoutDisplay = ({
                   💪 Workout
                 </CardTitle>
                 <div className="flex items-center gap-2 shrink-0">
-                  {workoutSteps.length > 0 && (
-                    <Button
-                      size="sm"
-                      className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
-                      onClick={() => openPlayer("Workout", workoutContentHtml, workoutSteps)}
-                      aria-label="Player Mode"
-                    >
-                      <Play className="h-4 w-4" />
-                      <span className="hidden lg:inline">Player</span>
-                    </Button>
-                  )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -393,17 +406,6 @@ export const WorkoutDisplay = ({
                   📆 Training Program
                 </CardTitle>
                 <div className="flex items-center gap-2 shrink-0">
-                  {trainingScheduleSteps.length > 0 && (
-                    <Button
-                      size="sm"
-                      className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
-                      onClick={() => openPlayer("Training Program", trainingScheduleHtml, trainingScheduleSteps)}
-                      aria-label="Player Mode"
-                    >
-                      <Play className="h-4 w-4" />
-                      <span className="hidden lg:inline">Player</span>
-                    </Button>
-                  )}
                   <Button
                     variant="outline"
                     size="sm"
@@ -436,17 +438,6 @@ export const WorkoutDisplay = ({
                   📆 Training Program
                 </CardTitle>
                 <div className="flex items-center gap-2 shrink-0">
-                  {personalProgramSteps.length > 0 && (
-                    <Button
-                      size="sm"
-                      className="gap-2 max-lg:h-9 max-lg:w-9 max-lg:p-0"
-                      onClick={() => openPlayer("Training Program", personalProgramHtml, personalProgramSteps)}
-                      aria-label="Player Mode"
-                    >
-                      <Play className="h-4 w-4" />
-                      <span className="hidden lg:inline">Player</span>
-                    </Button>
-                  )}
                   <Button
                     variant="outline"
                     size="sm"
