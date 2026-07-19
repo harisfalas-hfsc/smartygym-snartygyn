@@ -592,6 +592,21 @@ serve(async (req) => {
       userIndex++;
       if (!authUser.email) continue;
 
+      // Skip test/dummy addresses — Resend rejects reserved domains (example.com, test, etc.)
+      const emailLower = authUser.email.toLowerCase();
+      if (
+        emailLower.endsWith("@example.com") ||
+        emailLower.endsWith("@example.org") ||
+        emailLower.endsWith("@example.net") ||
+        emailLower.endsWith("@test.com") ||
+        emailLower.endsWith(".test") ||
+        emailLower.endsWith(".invalid") ||
+        emailLower.endsWith(".localhost")
+      ) {
+        emailsSkipped++;
+        continue;
+      }
+
       const prefs = (profilesMap.get(authUser.id) as Record<string, any>) || {};
 
       // Single email gate for the combined Morning Daily Digest
