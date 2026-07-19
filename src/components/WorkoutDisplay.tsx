@@ -333,6 +333,30 @@ export const WorkoutDisplay = ({
       {/* Workout Tools - Timer, 1RM Calculator, Exercise Library */}
       <WorkoutToolsCards />
 
+      {/* Start Your Workout - big clickable bar aligned with tools bar */}
+      {(() => {
+        const playerTarget =
+          workoutSteps.length > 0
+            ? { label: "Workout", html: workoutContentHtml, steps: workoutSteps }
+            : trainingScheduleSteps.length > 0
+            ? { label: "Training Program", html: trainingScheduleHtml, steps: trainingScheduleSteps }
+            : personalProgramSteps.length > 0
+            ? { label: "Training Program", html: personalProgramHtml, steps: personalProgramSteps }
+            : null;
+        if (!playerTarget) return null;
+        return (
+          <button
+            type="button"
+            onClick={() => openPlayer(playerTarget.label, playerTarget.html, playerTarget.steps)}
+            aria-label="Start your workout with the Player"
+            className="mt-3 w-full flex items-center justify-center gap-3 p-3 rounded-lg shadow-md border-2 border-primary/40 bg-primary text-primary-foreground hover:bg-primary/90 hover:border-primary transition-all font-semibold text-sm sm:text-base focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <Play className="h-5 w-5 fill-current" />
+            <span>Start your workout with the Player</span>
+          </button>
+        );
+      })()}
+
 
       {/* CONTENT SECTIONS - Display exactly as written, no automatic headers */}
       <div className="mt-8">
