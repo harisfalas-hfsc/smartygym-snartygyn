@@ -600,15 +600,13 @@ export const WorkoutDisplay = ({
           />
         )}
 
-        {/* Compact share row — below interactions */}
+        {/* Share row — full width, aligned with interactions */}
         {(workoutId || programId) && (
-          <div className="flex justify-end px-1">
-            <ShareButtons
-              title={title}
-              url={typeof window !== 'undefined' ? window.location.href : 'https://smartygym.com'}
-              compact
-            />
-          </div>
+          <ShareButtons
+            title={title}
+            url={typeof window !== 'undefined' ? window.location.href : 'https://smartygym.com'}
+            compact
+          />
         )}
 
         {/* PAR-Q Reminder */}
