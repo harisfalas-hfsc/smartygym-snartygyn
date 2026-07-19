@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Heart, Star, CheckCircle2, Crown, CalendarClock } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useNavigate } from "react-router-dom";
@@ -385,115 +386,78 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-4 p-4 bg-muted rounded-lg">
-        <Button
-          onClick={toggleFavorite}
-          variant={isFavorite ? "default" : "outline"}
-          size="sm"
-          className="gap-2"
-        >
-          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-          {isFavorite ? 'Favorited' : 'Add to Favorites'}
-        </Button>
+      <TooltipProvider delayDuration={150}>
+        <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-muted/60 rounded-lg border border-border">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={toggleFavorite} variant={isFavorite ? "default" : "ghost"} size="icon" className="h-9 w-9" aria-label={isFavorite ? "Favorited" : "Add to favorites"}>
+                <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{isFavorite ? 'Favorited' : 'Add to favorites'}</TooltipContent>
+          </Tooltip>
 
-        <Button
-          onClick={handleScheduleClick}
-          variant={scheduledWorkout ? "default" : "outline"}
-          size="sm"
-          className="gap-2"
-        >
-          <CalendarClock className="w-4 h-4" />
-          {scheduledWorkout 
-            ? `Scheduled: ${format(new Date(scheduledWorkout.scheduled_date), 'MMM d')}`
-            : 'Schedule'
-          }
-        </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button onClick={handleScheduleClick} variant={scheduledWorkout ? "default" : "ghost"} size="icon" className="h-9 w-9" aria-label={scheduledWorkout ? `Scheduled ${format(new Date(scheduledWorkout.scheduled_date), 'MMM d')}` : 'Schedule'}>
+                <CalendarClock className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{scheduledWorkout ? `Scheduled: ${format(new Date(scheduledWorkout.scheduled_date), 'MMM d')}` : 'Schedule'}</TooltipContent>
+          </Tooltip>
 
-        {/* 3-State Program Progress Toggle */}
-        {!isOngoing && !isCompleted && (
-          <Button
-            onClick={startProgram}
-            variant="ghost"
-            size="sm"
-            className="gap-2"
-          >
-            <CheckCircle2 className="w-4 h-4" />
-            Start Program
-          </Button>
-        )}
-
-        {isOngoing && !isCompleted && (
-          <>
-            <Button
-              variant="default"
-              size="sm"
-              className="gap-2 bg-orange-500 hover:bg-orange-600"
-              disabled
-            >
-              <CheckCircle2 className="w-4 h-4 fill-current" />
-              In Progress 🔥
-            </Button>
-            <Button
-              onClick={markComplete}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
+          {!isOngoing && !isCompleted && (
+            <Button onClick={startProgram} variant="ghost" size="sm" className="h-9 gap-1.5 text-xs">
               <CheckCircle2 className="w-4 h-4" />
-              Complete
+              Start
             </Button>
-          </>
-        )}
+          )}
+          {isOngoing && !isCompleted && (
+            <>
+              <Button size="sm" className="h-9 gap-1.5 text-xs bg-orange-500 hover:bg-orange-600" disabled>
+                <CheckCircle2 className="w-4 h-4 fill-current" />
+                In Progress
+              </Button>
+              <Button onClick={markComplete} variant="outline" size="sm" className="h-9 gap-1.5 text-xs">
+                <CheckCircle2 className="w-4 h-4" />
+                Complete
+              </Button>
+            </>
+          )}
+          {isCompleted && (
+            <>
+              <Button size="sm" className="h-9 gap-1.5 text-xs bg-green-500 hover:bg-green-600" disabled>
+                <CheckCircle2 className="w-4 h-4 fill-current" />
+                Completed
+              </Button>
+              <Button onClick={resetProgram} variant="ghost" size="sm" className="h-9 text-xs">
+                Reset
+              </Button>
+            </>
+          )}
 
-        {isCompleted && (
-          <>
-            <Button
-              variant="default"
-              size="sm"
-              className="gap-2 bg-green-500 hover:bg-green-600"
-              disabled
-            >
-              <CheckCircle2 className="w-4 h-4 fill-current" />
-              Completed ✓
-            </Button>
-            <Button
-              onClick={resetProgram}
-              variant="ghost"
-              size="sm"
-              className="gap-2"
-            >
-              Reset
-            </Button>
-          </>
-        )}
-
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold">Rate:</span>
-          <div className="flex gap-1">
+          <div className="flex items-center gap-0.5 pl-1 ml-1 border-l border-border">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 onClick={() => handleRating(star)}
-                className="focus:outline-none transition-transform hover:scale-110"
+                className="focus:outline-none transition-transform hover:scale-110 p-1"
+                aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
               >
-                <Star
-                  className={`w-5 h-5 ${
-                    star <= rating
-                      ? 'fill-yellow-500 text-yellow-500'
-                      : 'text-gray-300'
-                  }`}
-                />
+                <Star className={`w-4 h-4 ${star <= rating ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground/50'}`} />
               </button>
             ))}
           </div>
-        </div>
 
-        <CommentDialog
-          programId={programId}
-          programName={programName}
-          programType={programType}
-        />
-      </div>
+          <div className="ml-auto">
+            <CommentDialog
+              programId={programId}
+              programName={programName}
+              programType={programType}
+            />
+          </div>
+        </div>
+      </TooltipProvider>
 
       <ScheduleWorkoutDialog
         isOpen={isScheduleDialogOpen}
