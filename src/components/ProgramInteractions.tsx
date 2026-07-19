@@ -389,12 +389,12 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
       <TooltipProvider delayDuration={150}>
         <div className="flex flex-col gap-1.5 p-2 bg-muted/60 rounded-lg border border-border">
           <div className="grid grid-cols-3 gap-1.5">
-            <Button onClick={toggleFavorite} variant={isFavorite ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-center">
+            <Button onClick={toggleFavorite} variant={isFavorite ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-start px-3">
               <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
               <span className="text-xs font-medium">{isFavorite ? 'Favorited' : 'Favorite'}</span>
             </Button>
 
-            <Button onClick={handleScheduleClick} variant={scheduledWorkout ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-center">
+            <Button onClick={handleScheduleClick} variant={scheduledWorkout ? "default" : "ghost"} size="sm" className="h-10 gap-2 justify-start px-3">
               <CalendarClock className="w-4 h-4" />
               <span className="text-xs font-medium truncate">
                 {scheduledWorkout ? format(new Date(scheduledWorkout.scheduled_date), 'MMM d') : 'Schedule'}
@@ -402,19 +402,19 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
             </Button>
 
             {!isOngoing && !isCompleted && (
-              <Button onClick={startProgram} variant="ghost" size="sm" className="h-10 gap-2 justify-center">
+              <Button onClick={startProgram} variant="ghost" size="sm" className="h-10 gap-2 justify-start px-3">
                 <CheckCircle2 className="w-4 h-4" />
                 <span className="text-xs font-medium">Start</span>
               </Button>
             )}
             {isOngoing && !isCompleted && (
-              <Button onClick={markComplete} size="sm" className="h-10 gap-2 justify-center bg-orange-500 hover:bg-orange-600 text-white">
+              <Button onClick={markComplete} size="sm" className="h-10 gap-2 justify-start px-3 bg-orange-500 hover:bg-orange-600 text-white">
                 <CheckCircle2 className="w-4 h-4" />
                 <span className="text-xs font-medium">Complete</span>
               </Button>
             )}
             {isCompleted && (
-              <Button onClick={resetProgram} size="sm" className="h-10 gap-2 justify-center bg-green-500 hover:bg-green-600 text-white">
+              <Button onClick={resetProgram} size="sm" className="h-10 gap-2 justify-start px-3 bg-green-500 hover:bg-green-600 text-white">
                 <CheckCircle2 className="w-4 h-4 fill-current" />
                 <span className="text-xs font-medium">Completed</span>
               </Button>
@@ -422,7 +422,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
           </div>
 
           <div className="grid grid-cols-3 gap-1.5">
-            <div className="h-10 flex items-center justify-center gap-2 rounded-md hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this program">
+            <div className="col-span-2 h-10 flex items-center justify-start gap-2 rounded-md px-3 hover:bg-accent/50 transition-colors" role="group" aria-label="Rate this program">
               <Star className={`w-4 h-4 ${rating > 0 ? 'fill-yellow-500 text-yellow-500' : ''}`} />
               <span className="text-xs font-medium">Rate</span>
               <div className="flex items-center gap-0.5">
@@ -444,7 +444,7 @@ export const ProgramInteractions = ({ programId, programType, programName, isFre
               programName={programName}
               programType={programType}
               triggerVariant="ghost"
-              triggerClassName="col-span-2 h-10 w-full gap-2 justify-center text-xs font-medium"
+              triggerClassName="h-10 w-full gap-2 justify-start px-3 text-xs font-medium"
             />
           </div>
         </div>
