@@ -5,6 +5,7 @@ import { getEmailHeaders, getEmailFooter } from "../_shared/email-utils.ts";
 import { MESSAGE_TYPES } from "../_shared/notification-types.ts";
 import { requireServiceRole } from "../_shared/cron-auth.ts";
 import { canSend } from "../_shared/notification-preferences.ts";
+import { isUnroutableEmail } from "../_shared/list-all-users.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
