@@ -582,32 +582,36 @@ export const WorkoutDisplay = ({
         )}
 
 
-        {/* Workout/Program Interactions */}
-        {workoutId && workoutCategory && (
-          <WorkoutInteractions
-            workoutId={workoutId}
-            workoutType={workoutCategory}
-            workoutName={title}
-            isFreeContent={isFreeContent}
-          />
-        )}
-        {programId && programType && (
-          <ProgramInteractions
-            programId={programId}
-            programType={programType}
-            programName={title}
-            isFreeContent={isFreeContent}
-          />
-        )}
-
-        {/* Share row — full width, aligned with interactions */}
-        {(workoutId || programId) && (
-          <ShareButtons
-            title={title}
-            url={typeof window !== 'undefined' ? window.location.href : 'https://smartygym.com'}
-            compact
-          />
-        )}
+        {/* Workout/Program Interactions + Share */}
+        <div className="flex flex-col lg:flex-row lg:items-stretch gap-3">
+          <div className="lg:flex-1 min-w-0">
+            {workoutId && workoutCategory && (
+              <WorkoutInteractions
+                workoutId={workoutId}
+                workoutType={workoutCategory}
+                workoutName={title}
+                isFreeContent={isFreeContent}
+              />
+            )}
+            {programId && programType && (
+              <ProgramInteractions
+                programId={programId}
+                programType={programType}
+                programName={title}
+                isFreeContent={isFreeContent}
+              />
+            )}
+          </div>
+          {(workoutId || programId) && (
+            <div className="lg:p-2 lg:bg-muted/60 lg:rounded-lg lg:border lg:border-border flex items-center justify-center">
+              <ShareButtons
+                title={title}
+                url={typeof window !== 'undefined' ? window.location.href : 'https://smartygym.com'}
+                compact
+              />
+            </div>
+          )}
+        </div>
 
         {/* PAR-Q Reminder */}
         <ParQReminder />
