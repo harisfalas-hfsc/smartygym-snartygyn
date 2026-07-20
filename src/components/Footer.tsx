@@ -43,15 +43,6 @@ export const Footer = () => {
             </button>
           </div>
 
-          {/* Sister Brands */}
-          <div className="flex items-center justify-center gap-x-4 text-sm text-muted-foreground">
-            <a href="https://smartymove.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-              Smarty Move
-            </a>
-            <a href="https://smartydiet.com" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-              Smarty Diet
-            </a>
-          </div>
 
           {/* Copyright */}
           <div className="text-center text-sm text-muted-foreground">
