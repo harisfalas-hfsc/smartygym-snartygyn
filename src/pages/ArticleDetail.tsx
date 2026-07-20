@@ -277,7 +277,7 @@ export const ArticleDetail = () => {
 
             <div className="pt-6">
               <h3 className="text-lg font-semibold mb-4">Share this article</h3>
-              <ShareButtons url={articleUrl} title={article.title} />
+              <ShareButtons url={articleUrl} title={article.title} compact={isMobile} />
             </div>
           </Card>
         </article>
