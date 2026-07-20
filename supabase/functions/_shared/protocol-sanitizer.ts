@@ -139,7 +139,7 @@ function cleanStrayAfterToken(
 
     const normalize = (s: string) => s
       .replace(/^[:\-–—\s]+/, "")
-      .replace(/[.,;:()\[\]{}]/g, " ")
+      .replace(/[\-–—.,;:()\[\]{}]/g, " ")
       .replace(/\s+/g, " ")
       .trim()
       .toLowerCase();
