@@ -28,6 +28,7 @@ export const ArticleDetail = () => {
   const slug = rawSlug?.replace(/\.html$/i, "");
   const navigate = useNavigate();
   const { user } = useAccessControl();
+  const isMobile = useIsMobile();
 
   const { data: article, isLoading, error } = useQuery({
     queryKey: ['article', slug],
