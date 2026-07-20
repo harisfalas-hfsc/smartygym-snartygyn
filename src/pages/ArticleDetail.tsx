@@ -19,6 +19,7 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { useAccessControl } from "@/contexts/AccessControlContext";
 import { getBlogArticleImage, toAbsoluteBlogImageUrl } from "@/utils/blogImages";
 import { ArticleSEOEnhancement } from "@/components/seo/ArticleSEOEnhancement";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 export const ArticleDetail = () => {
@@ -27,6 +28,7 @@ export const ArticleDetail = () => {
   const slug = rawSlug?.replace(/\.html$/i, "");
   const navigate = useNavigate();
   const { user } = useAccessControl();
+  const isMobile = useIsMobile();
 
   const { data: article, isLoading, error } = useQuery({
     queryKey: ['article', slug],
@@ -275,7 +277,7 @@ export const ArticleDetail = () => {
 
             <div className="pt-6">
               <h3 className="text-lg font-semibold mb-4">Share this article</h3>
-              <ShareButtons url={articleUrl} title={article.title} />
+              <ShareButtons url={articleUrl} title={article.title} compact={isMobile} />
             </div>
           </Card>
         </article>
