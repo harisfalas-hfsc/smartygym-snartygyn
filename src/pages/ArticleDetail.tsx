@@ -19,6 +19,7 @@ import { SEOEnhancer } from "@/components/SEOEnhancer";
 import { useAccessControl } from "@/contexts/AccessControlContext";
 import { getBlogArticleImage, toAbsoluteBlogImageUrl } from "@/utils/blogImages";
 import { ArticleSEOEnhancement } from "@/components/seo/ArticleSEOEnhancement";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 
 export const ArticleDetail = () => {
