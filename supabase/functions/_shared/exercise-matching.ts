@@ -788,6 +788,12 @@ export function processContentWithExerciseMatching(
     // Keep just the markup, strip trailing duplicated parentheticals
     return markup;
   });
+  // 3. Fix versioned-name suffix duplication: e.g.
+  // "{{exercise:0735:sit-up v. 2}}-up v. 2-up v. 2" → keep only the token.
+  processedContent = processedContent.replace(
+    /(\{\{exercise:[^:}]+:[^}]*\bv\.\s*2\}\})(?:\s*-?up\s+v\.\s*2)+/gi,
+    '$1',
+  );
   
   console.log(`${logPrefix} Summary: ${matched.length} matched, ${unmatched.length} unmatched`);
   

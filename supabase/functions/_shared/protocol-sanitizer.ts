@@ -155,6 +155,28 @@ function cleanStrayAfterToken(
       return token;
     }
 
+    // Specific generator/linker artifact seen with versioned library names such as
+    // `{{exercise:0735:sit-up v. 2}}-up v. 2-up v. 2...`: the replacement matched
+    // only the `sit` prefix and left the `-up v. 2` suffix repeated after the token.
+    // Keep the valid library token and remove only repeated suffix fragments.
+    const exerciseWords = exerciseNormalized.split(" ").filter(Boolean);
+    const suffixPattern = exerciseWords.length >= 2
+      ? exerciseWords.slice(1).join("\\s+")
+      : "";
+    const repeatedExerciseSuffix = suffixPattern
+      ? new RegExp(`^(?:${suffixPattern}\\s*){1,}$`, "i").test(trailingNormalized)
+      : false;
+    const repeatedVersionSuffix = /^up\s+v\s+2(?:\s+up\s+v\s+2)*$/i.test(trailingNormalized);
+    if (repeatedExerciseSuffix || repeatedVersionSuffix) {
+      issues.push({
+        type: "stray_after_token",
+        detail: trimmed.slice(0, 120),
+        snippet: `${token}${trimmed.slice(0, 120)}`,
+      });
+      fixes.push(`Removed duplicated exercise suffix after token: "${trimmed.slice(0, 60)}"`);
+      return token;
+    }
+
     if (isBenignTokenQualifier(trimmed)) {
       return match;
     }
