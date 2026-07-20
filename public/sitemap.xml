@@ -481,12 +481,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/challenge/velocity-core.html</loc>
-    <lastmod>2026-06-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/workout/cardio/phantom-sprint-assault.html</loc>
     <lastmod>2026-06-14</lastmod>
     <changefreq>weekly</changefreq>
@@ -769,12 +763,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/challenge/summit-scramble.html</loc>
-    <lastmod>2026-06-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://smartygym.com/workout/strength/bodyweight-ascent.html</loc>
     <lastmod>2026-06-21</lastmod>
     <changefreq>weekly</changefreq>
@@ -783,6 +771,18 @@
   <url>
     <loc>https://smartygym.com/workout/pilates/cadence-center-align.html</loc>
     <lastmod>2026-07-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/workout/challenge/velocity-core.html</loc>
+    <lastmod>2026-07-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/workout/challenge/summit-scramble.html</loc>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -807,6 +807,12 @@
   <url>
     <loc>https://smartygym.com/workout/metabolic/ignition-drive-surge.html</loc>
     <lastmod>2026-06-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://smartygym.com/workout/challenge/summit-ascent.html</loc>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -1711,13 +1717,13 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/mobility/tether-and-glide.html</loc>
-    <lastmod>2026-06-14</lastmod>
+    <loc>https://smartygym.com/workout/cardio/cardio-overdrive.html</loc>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/cardio/cardio-overdrive.html</loc>
+    <loc>https://smartygym.com/workout/mobility/tether-and-glide.html</loc>
     <lastmod>2026-06-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -2079,12 +2085,6 @@
   <url>
     <loc>https://smartygym.com/workout/challenge/relay-ascent.html</loc>
     <lastmod>2026-06-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://smartygym.com/workout/challenge/summit-ascent.html</loc>
-    <lastmod>2026-07-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2510,7 +2510,7 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/challenge/bodyweight-gauntlet-grind.html</loc>
-    <lastmod>2026-06-14</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2546,7 +2546,7 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/challenge/endure-threshold-trial.html</loc>
-    <lastmod>2026-06-14</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2557,14 +2557,14 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/challenge/trial-by-circuit.html</loc>
+    <loc>https://smartygym.com/workout/calorie-burning/iron-ember-forge.html</loc>
     <lastmod>2026-06-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/calorie-burning/iron-ember-forge.html</loc>
-    <lastmod>2026-06-14</lastmod>
+    <loc>https://smartygym.com/workout/challenge/trial-by-circuit.html</loc>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2876,7 +2876,7 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/pilates/intermediate-core-balance.html</loc>
-    <lastmod>2026-06-15</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -2894,7 +2894,7 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/pilates/core-align-flow.html</loc>
-    <lastmod>2026-06-21</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -3002,7 +3002,7 @@
   </url>
   <url>
     <loc>https://smartygym.com/workout/pilates/core-align-mobility.html</loc>
-    <lastmod>2026-06-21</lastmod>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -3385,14 +3385,14 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/strength/lower-push-upper-pull-synthesis.html</loc>
-    <lastmod>2026-06-14</lastmod>
+    <loc>https://smartygym.com/workout/mobility/stability-core.html</loc>
+    <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/mobility/stability-core.html</loc>
-    <lastmod>2026-07-09</lastmod>
+    <loc>https://smartygym.com/workout/strength/lower-push-upper-pull-synthesis.html</loc>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -3523,14 +3523,14 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/challenge/bodyweight-gauntlet.html</loc>
+    <loc>https://smartygym.com/workout/cardio/flow-state-drive.html</loc>
     <lastmod>2026-06-14</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://smartygym.com/workout/cardio/flow-state-drive.html</loc>
-    <lastmod>2026-06-14</lastmod>
+    <loc>https://smartygym.com/workout/challenge/bodyweight-gauntlet.html</loc>
+    <lastmod>2026-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
