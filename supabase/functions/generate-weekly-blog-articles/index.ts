@@ -21,6 +21,29 @@ const corsHeaders = {
 };
 
 const CATEGORIES = ["Fitness", "Nutrition", "Wellness"];
+const AI_REQUEST_TIMEOUT_MS = 65_000;
+const IMAGE_REQUEST_TIMEOUT_MS = 45_000;
+const MULTI_CATEGORY_DEADLINE_GUARD_MS = 115_000;
+
+type ArticleResult = { category: string; title: string; slug: string; status: string };
+
+function getUtcWeekStart(date = new Date()): string {
+  const weekStart = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const daysSinceMonday = (weekStart.getUTCDay() + 6) % 7;
+  weekStart.setUTCDate(weekStart.getUTCDate() - daysSinceMonday);
+  weekStart.setUTCHours(0, 0, 0, 0);
+  return weekStart.toISOString();
+}
+
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
 
 const CATEGORY_TOPICS: Record<string, string[]> = {
   Fitness: [
@@ -190,14 +213,14 @@ async function generateBlogImage(
   content: string
 ): Promise<string | null> {
   try {
-    const response = await fetch(`${supabaseUrl}/functions/v1/generate-blog-image`, {
+    const response = await fetchWithTimeout(`${supabaseUrl}/functions/v1/generate-blog-image`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${anonKey}`,
       },
       body: JSON.stringify({ title, category, slug, excerpt, content }),
-    });
+    }, IMAGE_REQUEST_TIMEOUT_MS);
 
     if (!response.ok) {
       console.error(`Image generation failed for "${title}": ${response.status}`);
@@ -224,6 +247,7 @@ serve(async (req: Request) => {
   }
 
   try {
+    const invocationStartedAt = Date.now();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -232,22 +256,58 @@ serve(async (req: Request) => {
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const results: { category: string; title: string; slug: string; status: string }[] = [];
+    const results: ArticleResult[] = [];
 
     // Optional body override: { categories: ["Wellness"] } to backfill a single category.
     let requestedCategories: string[] = CATEGORIES;
+    let force = false;
+    let skipExistingThisWeek = true;
     try {
       if (req.headers.get("content-type")?.includes("application/json")) {
         const body = await req.json();
         if (Array.isArray(body?.categories) && body.categories.length > 0) {
-          requestedCategories = body.categories.filter((c: string) => CATEGORIES.includes(c));
+          requestedCategories = Array.from(new Set(body.categories.filter((c: string) => CATEGORIES.includes(c))));
         }
+        force = body?.force === true;
+        skipExistingThisWeek = body?.skipExistingThisWeek !== false;
       }
     } catch { /* no body — use all */ }
+
+    const weekStartIso = getUtcWeekStart();
 
     for (const category of requestedCategories) {
       try {
         console.log(`\n=== Generating ${category} article ===`);
+
+        if (skipExistingThisWeek && !force) {
+          const { data: weeklyArticle, error: weeklyCheckError } = await supabase
+            .from("blog_articles")
+            .select("title, slug, created_at")
+            .eq("category", category)
+            .gte("created_at", weekStartIso)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (weeklyCheckError) {
+            console.warn(`Weekly duplicate check failed for ${category}:`, weeklyCheckError.message);
+          } else if (weeklyArticle) {
+            console.log(`Skipping ${category}: already published this week (${weeklyArticle.title})`);
+            results.push({
+              category,
+              title: weeklyArticle.title,
+              slug: weeklyArticle.slug || "",
+              status: "Skipped (already published this week)",
+            });
+            continue;
+          }
+        }
+
+        if (requestedCategories.length > 1 && Date.now() - invocationStartedAt > MULTI_CATEGORY_DEADLINE_GUARD_MS) {
+          console.warn(`Skipping ${category}: deadline guard reached; staggered retry jobs will handle it`);
+          results.push({ category, title: "", slug: "", status: "Skipped (deadline guard; retry job will handle)" });
+          continue;
+        }
 
         // Fetch recent titles to avoid duplicates
         const { data: recentArticles } = await supabase
@@ -312,20 +372,31 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
         let parsed: { title: string; excerpt: string; content: string } | null = null;
         let lastFailure = "unknown";
         for (let attempt = 1; attempt <= 3; attempt++) {
-          const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${LOVABLE_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              model: "google/gemini-2.5-pro",
-              messages: [
-                { role: "system", content: "You are a professional fitness blog content writer. Always respond with valid JSON only, no markdown formatting." },
-                { role: "user", content: prompt }
-              ],
-            }),
-          });
+          let aiResponse: Response;
+          try {
+            aiResponse = await fetchWithTimeout("https://ai.gateway.lovable.dev/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${LOVABLE_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: "google/gemini-2.5-pro",
+                messages: [
+                  { role: "system", content: "You are a professional fitness blog content writer. Always respond with valid JSON only, no markdown formatting." },
+                  { role: "user", content: prompt }
+                ],
+              }),
+            }, AI_REQUEST_TIMEOUT_MS);
+          } catch (fetchError: any) {
+            const timedOut = fetchError?.name === "AbortError";
+            lastFailure = timedOut
+              ? `AI timeout after ${Math.round(AI_REQUEST_TIMEOUT_MS / 1000)}s`
+              : `AI request error: ${fetchError?.message || String(fetchError)}`;
+            console.error(`AI request failed for ${category} (attempt ${attempt}/3):`, lastFailure);
+            await new Promise(r => setTimeout(r, 3000 * attempt));
+            continue;
+          }
 
           if (!aiResponse.ok) {
             const errText = await aiResponse.text();
@@ -380,17 +451,22 @@ RESPOND WITH EXACTLY THIS JSON FORMAT (no markdown, no code blocks, just raw JSO
           continue;
         }
 
-        // Generate image
-        console.log(`Generating image for: ${parsed.title}`);
-        const imageUrl = await generateBlogImage(
-          supabaseUrl,
-          supabaseServiceKey,
-          parsed.title,
-          category,
-          slug,
-          parsed.excerpt || parsed.title,
-          parsed.content
-        );
+        // Generate image, but never let image creation prevent the article itself from publishing.
+        let imageUrl: string | null = null;
+        if (Date.now() - invocationStartedAt < MULTI_CATEGORY_DEADLINE_GUARD_MS) {
+          console.log(`Generating image for: ${parsed.title}`);
+          imageUrl = await generateBlogImage(
+            supabaseUrl,
+            supabaseServiceKey,
+            parsed.title,
+            category,
+            slug,
+            parsed.excerpt || parsed.title,
+            parsed.content
+          );
+        } else {
+          console.warn(`Skipping image for ${parsed.title}: deadline guard reached`);
+        }
 
         // Insert and auto-publish
         const { data: insertedArticle, error: insertError } = await supabase
