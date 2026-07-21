@@ -72,6 +72,12 @@ const MOBILITY_STABILITY_FORBIDDEN_EXERCISES: RegExp[] = [
   /\b(crunch(?:es)?|sit-?ups?|russian\s*twists?|bicycle\s*crunch|leg\s*raise\s*crunch|vertical\s*leg\s*raise|hanging\s*(?:straight\s*)?leg\s*raise|seated\s*leg\s*raise|twisted\s*leg\s*raise|frog\s*crunch|reverse\s*crunch)\b/i,
 ];
 
+const CHALLENGE_FORBIDDEN_WORK_BLOCK_EXERCISES: RegExp[] = [
+  /\b(stretch(?:ing)?|mobility|pose|cat-?cow|cobra|sphinx|upward\s+facing\s+dog|child'?s\s+pose|pigeon|butterfly|world\s+greatest\s+stretch)\b/i,
+  /\b(hamstring|quad(?:riceps?)?|calf|adductor|piriformis|glute\s+stretch|triceps\s+stretch|upper\s+back\s+stretch|all\s+fours\s+squad\s+stretch)\b/i,
+  /\b(skin\s+the\s+cat|inchworm)\b/i,
+];
+
 export interface SectionValidationResult {
   isComplete: boolean;
   missingSections: string[];
@@ -105,6 +111,31 @@ export function validateMobilityStabilityExerciseCompatibility(
       return MOBILITY_STABILITY_FORBIDDEN_EXERCISES.some((pattern) => pattern.test(name));
     })
     .map((name) => `Mobility & Stability contains incompatible exercise: ${name}`);
+}
+
+function exerciseNamesBetween(html: string, startIcon: string, endIcon: string | null): string[] {
+  const startIdx = html.indexOf(startIcon);
+  if (startIdx === -1) return [];
+  const endIdx = endIcon ? html.indexOf(endIcon, startIdx + 1) : -1;
+  const sectionContent = html.substring(startIdx, endIdx === -1 ? html.length : endIdx);
+  return [...sectionContent.matchAll(/\{\{exercise:[^:}]+:([^}]+)\}\}/gi)]
+    .map((match) => match[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+}
+
+export function validateChallengeWorkBlockCompatibility(
+  html: string | null | undefined,
+  category: string | null | undefined,
+): string[] {
+  if (!html || (category || "").toUpperCase() !== "CHALLENGE") return [];
+  const workBlockNames = [
+    ...exerciseNamesBetween(html, SECTION_ICONS.MAIN_WORKOUT, SECTION_ICONS.FINISHER),
+    ...exerciseNamesBetween(html, SECTION_ICONS.FINISHER, SECTION_ICONS.COOL_DOWN),
+  ];
+
+  return workBlockNames
+    .filter((name) => CHALLENGE_FORBIDDEN_WORK_BLOCK_EXERCISES.some((pattern) => pattern.test(name)))
+    .map((name) => `Challenge work blocks cannot contain stretching/mobility exercises: ${name}`);
 }
 
 /**
@@ -252,7 +283,10 @@ export function validateWodSections(
 
   const hasMinimumExercises = exerciseContentIssues.length === 0;
   const softTissueIssues = validateSoftTissueBlock(mainWorkoutHtml);
-  const mobilityCompatibilityIssues = validateMobilityStabilityExerciseCompatibility(mainWorkoutHtml, category);
+  const mobilityCompatibilityIssues = [
+    ...validateMobilityStabilityExerciseCompatibility(mainWorkoutHtml, category),
+    ...validateChallengeWorkBlockCompatibility(mainWorkoutHtml, category),
+  ];
 
   return {
     isComplete: missingIcons.length === 0 && exerciseContentIssues.length === 0 && softTissueIssues.length === 0 && mobilityCompatibilityIssues.length === 0,
