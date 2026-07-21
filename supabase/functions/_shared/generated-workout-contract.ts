@@ -18,11 +18,12 @@
  *   - Carry the actual library Name for that ID (no renamed/invented names)
  */
 
-export interface ContractExercise { id: string; name: string }
+export interface ContractExercise { id: string; name: string; category?: string | null }
 
 export interface ContractOptions {
   isMicro?: boolean;
   isRecovery?: boolean;
+  category?: string | null;
   /** Sections we require exercise prescriptions to come BEFORE the token. */
   enforcePrescription?: boolean;
 }
@@ -60,6 +61,9 @@ const SOFT_TISSUE_KEYWORDS = [
 // which do NOT belong in 🧽 Soft Tissue Preparation.
 const SOFT_TISSUE_FORBIDDEN_RE =
   /\b(stretch|circle|raise|swing|lunge|pose|march|bridge|squat|press|row|curl|twist|hydrant|cobra|cat-cow|catcow|sun salutation|push-?up|pull-?up|sit-?up|crunch|burpee|jump|jack|climb|plank|deadlift|clean|snatch|jerk|thruster|kick)\b/i;
+
+const CHALLENGE_FORBIDDEN_WORK_BLOCK_RE =
+  /\b(stretch(?:ing)?|mobility|pose|cat-?cow|cobra|sphinx|upward\s+facing\s+dog|child'?s\s+pose|pigeon|butterfly|world\s+greatest\s+stretch|hamstring|quad(?:riceps?)?|calf|adductor|piriformis|glute\s+stretch|triceps\s+stretch|upper\s+back\s+stretch|all\s+fours\s+squad\s+stretch|skin\s+the\s+cat|inchworm)\b/i;
 
 function sectionSlice(html: string, startIcon: string): string {
   const start = html.indexOf(startIcon);
@@ -189,6 +193,26 @@ function validateExerciseSection(
   }
 }
 
+function validateChallengeWorkBlocks(html: string, library: ContractExercise[], failures: string[]): void {
+  const libById = new Map(library.map((e) => [e.id, e]));
+  for (const [icon, label] of [[ICONS.MAIN, "Main Workout"], [ICONS.FINISHER, "Finisher"]] as const) {
+    const block = sectionSlice(html, icon);
+    if (!block) continue;
+    TOKEN_RE.lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = TOKEN_RE.exec(block)) !== null) {
+      const id = m[1].trim();
+      const tokenName = m[2].trim();
+      const lib = libById.get(id);
+      const name = lib?.name || tokenName;
+      const libCategory = (lib?.category || "").toLowerCase();
+      if (libCategory === "stretching" || libCategory === "mobility" || CHALLENGE_FORBIDDEN_WORK_BLOCK_RE.test(name)) {
+        failures.push(`${label} (${icon}): Challenge work blocks cannot contain stretching/mobility exercise "${name}"`);
+      }
+    }
+  }
+}
+
 export function validateGeneratedWorkoutContract(
   html: string,
   library: ContractExercise[],
@@ -199,7 +223,7 @@ export function validateGeneratedWorkoutContract(
     return { ok: false, failures: ["main_workout content is empty"] };
   }
 
-  const { isMicro = false, isRecovery = false } = opts;
+  const { isMicro = false, isRecovery = false, category = null } = opts;
 
   if (isMicro) {
     // Micro workouts: only 🔥 / 💪 / 🧘 are required, no soft tissue, no finisher.
@@ -216,6 +240,10 @@ export function validateGeneratedWorkoutContract(
     validateExerciseSection(html, ICONS.FINISHER, "Finisher", library, failures, true, true);
   }
   validateExerciseSection(html, ICONS.COOL_DOWN, "Cool Down", library, failures, false, true);
+
+  if ((category || "").toUpperCase() === "CHALLENGE") {
+    validateChallengeWorkBlocks(html, library, failures);
+  }
 
   return { ok: failures.length === 0, failures };
 }

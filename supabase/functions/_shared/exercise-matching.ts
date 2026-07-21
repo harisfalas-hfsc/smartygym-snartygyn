@@ -6,6 +6,7 @@
 export interface ExerciseBasic {
   id: string;
   name: string;
+  category?: string | null;
   body_part: string;
   equipment: string;
   target: string;
@@ -1112,6 +1113,16 @@ export function buildExerciseReferenceList(exercises: ExerciseBasic[], equipment
   return lines.join('\n');
 }
 
+const CHALLENGE_INCOMPATIBLE_EXERCISE_RE = /\b(stretch(?:ing)?|mobility|pose|cat-?cow|cobra|sphinx|upward\s+facing\s+dog|child'?s\s+pose|pigeon|butterfly|world\s+greatest\s+stretch|hamstring|quad(?:riceps?)?|calf|adductor|piriformis|glute\s+stretch|triceps\s+stretch|upper\s+back\s+stretch|all\s+fours\s+squad\s+stretch|skin\s+the\s+cat|inchworm)\b/i;
+
+function filterOutChallengeIncompatibleExercises(exercises: ExerciseBasic[]): ExerciseBasic[] {
+  return exercises.filter((ex) => {
+    const category = (ex.category || "").toLowerCase();
+    if (category === "stretching" || category === "mobility") return false;
+    return !CHALLENGE_INCOMPATIBLE_EXERCISE_RE.test(ex.name || "");
+  });
+}
+
 /**
  * BULLETPROOF FINAL SWEEP: Scan every <li> that lacks {{exercise:}} markup.
  * For each, extract the text, find the CLOSEST library exercise (no threshold floor),
@@ -1443,7 +1454,8 @@ export async function fetchAndBuildExerciseReference(
   supabaseClient: any,
   logPrefix: string = "[EXERCISE-REF]",
   equipmentFilter?: string,
-  difficultyLevel?: string
+  difficultyLevel?: string,
+  workoutCategory?: string
 ): Promise<{ exercises: ExerciseBasic[]; referenceList: string }> {
   // Paginate to get ALL exercises (Supabase default limit is 1000)
   const allExercises: ExerciseBasic[] = [];
@@ -1453,7 +1465,7 @@ export async function fetchAndBuildExerciseReference(
   while (true) {
     const { data, error } = await supabaseClient
       .from("exercises")
-      .select("id, name, body_part, equipment, target, difficulty")
+      .select("id, name, category, body_part, equipment, target, difficulty")
       .range(from, from + pageSize - 1);
     
     if (error) {
@@ -1467,16 +1479,23 @@ export async function fetchAndBuildExerciseReference(
     from += pageSize;
   }
   
-  console.log(`${logPrefix} Loaded ${allExercises.length} exercises from library${equipmentFilter ? ` (filter: ${equipmentFilter})` : ' (full library)'}`);
-  const referenceList = buildExerciseReferenceList(allExercises, equipmentFilter, difficultyLevel);
+  let referenceSource = allExercises;
+  if ((workoutCategory || "").toUpperCase() === "CHALLENGE") {
+    const before = referenceSource.length;
+    referenceSource = filterOutChallengeIncompatibleExercises(referenceSource);
+    console.log(`${logPrefix} Challenge guardrail removed ${before - referenceSource.length} stretching/mobility exercises from generation pool`);
+  }
+
+  console.log(`${logPrefix} Loaded ${referenceSource.length} exercises from library${equipmentFilter ? ` (filter: ${equipmentFilter})` : ' (full library)'}`);
+  const referenceList = buildExerciseReferenceList(referenceSource, equipmentFilter, difficultyLevel);
   
   // Return filtered exercises for post-processing matching too
   const normalizedEquipmentFilter = (equipmentFilter || '').toLowerCase();
   let exercisesForMatching = normalizedEquipmentFilter === NON_BODYWEIGHT_FILTER
-    ? allExercises.filter(ex => !isBodyweightEquipmentValue(ex.equipment))
+    ? referenceSource.filter(ex => !isBodyweightEquipmentValue(ex.equipment))
     : equipmentFilter
-      ? allExercises.filter(ex => (ex.equipment || '').toLowerCase() === normalizedEquipmentFilter)
-      : allExercises;
+      ? referenceSource.filter(ex => (ex.equipment || '').toLowerCase() === normalizedEquipmentFilter)
+      : referenceSource;
   if ((equipmentFilter || '').toLowerCase() === 'body weight') {
     const before = exercisesForMatching.length;
     exercisesForMatching = filterToHomeBodyweight(exercisesForMatching);

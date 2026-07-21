@@ -85,8 +85,8 @@ function categoryGuidance(category: string, equipment: string, focus?: string): 
         : "Controlled equipment-assisted mobility & stability ONLY: bands, balance board, foam roller, ex-ball, rope-assisted stretches. HARD BAN: KB power work, heavy strength, conditioning, crunches, sit-ups.";
     case "CHALLENGE":
       return eq
-        ? "Test-style bodyweight challenge: AMRAP/For-Time pieces with multiple rounds, varied movement patterns."
-        : "Test-style challenge with implements: rounds-for-time, complex chippers, mixed modality.";
+        ? "Test-style bodyweight challenge: AMRAP/For-Time pieces with multiple rounds, varied high-output movement patterns. HARD BAN in Main Workout and Finisher: stretching, mobility, yoga poses, static flexibility drills, or recovery exercises. Challenge means benchmark intensity, capacity, time pressure, reps, rounds, and discomfort tolerance — not stretching."
+        : "Test-style challenge with implements: rounds-for-time, complex chippers, mixed modality. HARD BAN in Main Workout and Finisher: stretching, mobility, yoga poses, static flexibility drills, or recovery exercises. Use loaded conditioning, carries, swings, thrusters, rowing/bike/jump rope, squats, hinges, pushes, pulls, and core under fatigue.";
     case "PILATES":
       return "Pilates studio standard: mat, reformer, magic circle, Pilates ball, light dumbbells, resistance bands ONLY. FORBIDDEN: kettlebells, barbells, heavy DBs, machines, cables, plyometrics, conditioning movements. Focus on controlled spinal articulation, deep core, breath-led tempo, REPS & SETS prescriptions.";
     case "RECOVERY":
@@ -534,7 +534,7 @@ serve(async (req) => {
     // Library
     const equipFilter = equipment === "BODYWEIGHT" ? "body weight" : "non-bodyweight";
     const { exercises: library, referenceList } =
-      await fetchAndBuildExerciseReference(supabase, "[WIZ]", equipFilter, difficulty.toLowerCase());
+      await fetchAndBuildExerciseReference(supabase, "[WIZ]", equipFilter, difficulty.toLowerCase(), body.category);
 
     let lastErr = "";
     try {
@@ -685,6 +685,7 @@ serve(async (req) => {
         const contract = validateGeneratedWorkoutContract(mainNorm, library as any, {
           isMicro,
           isRecovery: body.category === "RECOVERY",
+          category: body.category,
         });
         if (!contract.ok) {
           log("⚠️ Quality contract warnings (delivering draft)", { failures: contract.failures.slice(0, 8) });

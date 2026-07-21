@@ -12,6 +12,7 @@ const LIB = [
   { id: "1366", name: "upward facing dog" },
   { id: "1604", name: "world greatest stretch" },
   { id: "1494", name: "butterfly yoga pose" },
+  { id: "1512", name: "all fours squad stretch", category: "stretching" },
   { id: "3021", name: "scapula push-up" },
   { id: "glute-bridge", name: "Glute Bridge" },
 ];
@@ -133,4 +134,14 @@ Deno.test("contract: token name mismatch is rejected", () => {
   const r = validateGeneratedWorkoutContract(html, LIB);
   assertEquals(r.ok, false);
   assertEquals(r.failures.some((f) => f.includes("does not match library name")), true);
+});
+
+Deno.test("contract: Challenge rejects stretching in work blocks", () => {
+  const html = VALID_HTML.replace(
+    "20 reps {{exercise:1160:burpee}}",
+    "20 reps {{exercise:1512:all fours squad stretch}}",
+  );
+  const r = validateGeneratedWorkoutContract(html, LIB, { category: "CHALLENGE" });
+  assertEquals(r.ok, false);
+  assertEquals(r.failures.some((f) => f.includes("Challenge work blocks cannot contain stretching/mobility exercise")), true);
 });
