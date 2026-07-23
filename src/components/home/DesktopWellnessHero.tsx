@@ -5,8 +5,8 @@ import { getBlogArticleImage } from "@/utils/blogImages";
 import toolTimerImage from "@/assets/tools/timer-card-mobile.jpg";
 import tool1RmImage from "@/assets/tools/1rm-card-mobile.jpg";
 import toolMacroImage from "@/assets/tools/macro-card-mobile.jpg";
-import heroVideoAsset from "@/assets/hero-smartygym-spliced.mp4.asset.json";
-const heroVideo = heroVideoAsset.url;
+import heroCityRunningAsset from "@/assets/hero-city-running.jpg.asset.json";
+const heroImage = heroCityRunningAsset.url;
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
 import heroProgramsImage from "@/assets/hero-programs.jpg";
 import heroBlogImage from "@/assets/hero-blog.jpg";
@@ -129,17 +129,14 @@ export const DesktopWellnessHero = ({
 
   return (
     <div className="hidden md:block">
-      {/* HERO — fullscreen video */}
+      {/* HERO — fullscreen image (NYC-style running couple) */}
       <section className="relative w-full h-screen overflow-hidden">
         <div className="absolute inset-0 bg-black" />
-        <video
+        <img
           className="absolute inset-0 w-full h-full object-cover"
-          src={heroVideo}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
+          src={heroImage}
+          alt=""
+          aria-hidden="true"
         />
         <div className="absolute inset-0 bg-black/55" />
 
