@@ -57,7 +57,7 @@ This guide explains how to capture high-quality screenshots of SmartyGym for iOS
 **Content to show:**
 - The workout generator form
 - Generated workout example (if possible, show completed generation)
-- Highlights the AI-powered personalization
+- Highlights the human-designed personalization (built by Sports Scientist Haris Falas)
 
 **Why:** Key differentiator feature that sets SmartyGym apart
 
