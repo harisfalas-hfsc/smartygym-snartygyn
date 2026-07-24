@@ -16,6 +16,8 @@ const heroSlides = [
   heroBarbellAsset.url,
   heroRopesAsset.url,
   heroTimerAsset.url,
+  "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1780027701304-rvna4t.png",
+  "https://cvccrvyimyzrxcwzmxwk.supabase.co/storage/v1/object/public/avatars/workout-covers/workout-1779073192594-qq9ham.jpg",
 ];
 import heroWorkoutsImage from "@/assets/hero-workouts-bright.jpg";
 import heroProgramsImage from "@/assets/hero-programs.jpg";
@@ -56,7 +58,7 @@ export const DesktopWellnessHero = ({
   useEffect(() => {
     const id = setInterval(() => {
       setSlide((s) => (s + 1) % heroSlides.length);
-    }, 5000);
+    }, 2750);
     return () => clearInterval(id);
   }, []);
 
@@ -163,7 +165,7 @@ export const DesktopWellnessHero = ({
               slide === i ? "opacity-100" : "opacity-0"
             }`}
             style={{
-              transitionDuration: "4800ms",
+              transitionDuration: "2600ms",
               animation: "heroKenBurns 20s ease-in-out infinite alternate",
               transformOrigin: i % 2 === 0 ? "center center" : "center 40%",
             }}
