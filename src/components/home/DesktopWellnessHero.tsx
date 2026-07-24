@@ -56,7 +56,7 @@ export const DesktopWellnessHero = ({
   useEffect(() => {
     const id = setInterval(() => {
       setSlide((s) => (s + 1) % heroSlides.length);
-    }, 2500);
+    }, 4000);
     return () => clearInterval(id);
   }, []);
 
@@ -163,8 +163,8 @@ export const DesktopWellnessHero = ({
               slide === i ? "opacity-100" : "opacity-0"
             }`}
             style={{
-              transitionDuration: "2000ms",
-              animation: slide === i ? "heroKenBurns 7s ease-out both" : "none",
+              transitionDuration: "2400ms",
+              animation: slide === i ? "heroKenBurns 12s ease-in-out both" : "none",
               transformOrigin: i % 2 === 0 ? "center center" : "center 40%",
             }}
           />
