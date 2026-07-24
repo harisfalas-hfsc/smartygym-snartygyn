@@ -1345,3 +1345,8 @@ body {
 .blog-article-content p:empty {
   display: none !important;
 }
+
+@keyframes heroKenBurns {
+  0% { transform: scale(1.06); }
+  100% { transform: scale(1.14); }
+}
